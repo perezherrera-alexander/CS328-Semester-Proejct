@@ -32,6 +32,8 @@ public class Movement : MonoBehaviour
     {
         rb = this.GetComponent<Rigidbody2D>();
 
+        movementSpeed /= 10;
+
         currentHealth = maxHealth;
         healthBar.SetMaxHealth(maxHealth);
 
@@ -44,7 +46,7 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /* For Testing
+        /*
         if (Input.GetKeyDown(KeyCode.Space))
         {
             TakeDamage(1);
@@ -55,7 +57,6 @@ public class Movement : MonoBehaviour
             UseMana(1);
         }
         */
-
     }
 
     // Called once per 0.2 seconds

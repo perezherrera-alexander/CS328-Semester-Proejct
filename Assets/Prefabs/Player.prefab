@@ -100,7 +100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e92dc7968a86104caa46b33d8b5c87a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 0.2
+  movementSpeed: 1
   maxHealth: 10
   currentHealth: 0
   healthBar: {fileID: 0}
@@ -108,7 +108,7 @@ MonoBehaviour:
   currentMana: 0
   manaBar: {fileID: 0}
   bulletPrefab: {fileID: 8620902242178562404, guid: 4cf024747222bc64b878adcd935f8d48, type: 3}
-  bulletSpeed: 6
+  bulletSpeed: 9
   shootingCooldown: 0.05
   randomAngleRange: 6
   randomSpeedRange: 1

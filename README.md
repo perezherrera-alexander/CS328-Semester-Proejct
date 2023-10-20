@@ -2,7 +2,12 @@
 
 Unity Version: 2022.3.9f1 (LTS)
 
-### Version 0.1.5 (Latest)
+### Version 0.2.0 (Latest)
+- Updated Player prefab so that movement speed is now on a different scale
+- Adjusted player speed and bullet speed to that the player does not outrun the bullets
+- Fixed an issue where the Level 2 button would load level 1
+
+### Version 0.1.5
 - Added new temporary geometry to levels 1 & 2.
 
 ### Version 0.1.4
