@@ -40,8 +40,7 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*
-        // For Testing
+        /* For Testing
         if (Input.GetKeyDown(KeyCode.Space))
         {
             TakeDamage(1);
@@ -55,13 +54,13 @@ public class Movement : MonoBehaviour
 
     }
 
+    // Called once per 0.2 seconds
     void FixedUpdate()
     {
         float inputX = Input.GetAxis("Horizontal");
         float inputY = Input.GetAxis("Vertical");
 
         Vector2 movement = new Vector2(inputX * movementSpeed, inputY * movementSpeed);
-        //Debug.Log(movement);
 
         rb.MovePosition(rb.position + movement);
 
@@ -87,7 +86,7 @@ public class Movement : MonoBehaviour
     void Shoot() {
         GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
- 
+    
         float randomAngle = Random.Range(-randomAngleRange, randomAngleRange);  // Get random angle deviation
         float adjustedBulletSpeed = bulletSpeed + Random.Range(-randomSpeedRange, randomSpeedRange);  // Get random speed deviation 
 
