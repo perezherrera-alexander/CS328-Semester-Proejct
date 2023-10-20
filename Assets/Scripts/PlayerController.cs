@@ -17,6 +17,13 @@ public class Movement : MonoBehaviour
     public int currentMana;
     public ManaBar manaBar;
 
+    public GameObject bulletPrefab;
+    public float bulletSpeed = 10f;
+    public float shootingCooldown = 0.05f;
+    private float nextShotTime = 0f;
+    public float randomAngleRange = 5f;
+    public float randomSpeedRange = 2f;
+
     // Start is called before the first frame update
 
     void Start()
@@ -57,6 +64,36 @@ public class Movement : MonoBehaviour
         //Debug.Log(movement);
 
         rb.MovePosition(rb.position + movement);
+
+        LookAtMouse();
+        HandleShooting();
+    }
+
+    void LookAtMouse() {
+        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 direction = mousePosition - rb.position;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+        rb.rotation = angle;
+    }
+
+    void HandleShooting() {
+        if (Input.GetMouseButton(0) && Time.time > nextShotTime)  // Left mouse button
+        {
+            Shoot();
+            nextShotTime = Time.time + shootingCooldown;
+        }
+    }
+
+    void Shoot() {
+        GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+ 
+        float randomAngle = Random.Range(-randomAngleRange, randomAngleRange);  // Get random angle deviation
+        float adjustedBulletSpeed = bulletSpeed + Random.Range(-randomSpeedRange, randomSpeedRange);  // Get random speed deviation 
+
+        Vector2 shootDirection = Quaternion.Euler(0, 0, randomAngle) * transform.up;  // Apply random angle deviation
+
+        bulletRb.AddForce(shootDirection * adjustedBulletSpeed, ForceMode2D.Impulse);
     }
 
     public void TakeDamage(int damage) {

@@ -30,3 +30,8 @@ Unity Version: 2022.3.9f1 (LTS)
         - Stops the game in background
     - Can exit to the main menu
     - Can exit the game
+
+### Version 0.1.4
+- Player now looks in mouse direction
+- Added bullet prefab and sprite
+- Player now can shoot
