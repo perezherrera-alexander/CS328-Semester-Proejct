@@ -1,8 +1,6 @@
-# CS328-Semester-Project
+## Previous Versions
 
-Unity Version: 2022.3.9f1 (LTS)
-
-### Version 0.1.5 (Latest)
+### Version 0.1.5
 - Added new temporary geometry to levels 1 & 2.
 
 ### Version 0.1.4
