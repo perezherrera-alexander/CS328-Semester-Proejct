@@ -24,6 +24,8 @@ public class Movement : MonoBehaviour
     public float randomAngleRange = 5f;
     public float randomSpeedRange = 2f;
 
+    bool isPaused;
+
     // Start is called before the first frame update
 
     void Start()
@@ -35,6 +37,8 @@ public class Movement : MonoBehaviour
 
         currentMana = maxMana;
         manaBar.SetMaxMana(maxMana);
+
+        isPaused = false;
     }
 
     // Update is called once per frame
@@ -96,13 +100,21 @@ public class Movement : MonoBehaviour
     }
 
     public void TakeDamage(int damage) {
-        currentHealth -= damage;
+        if (currentHealth - damage <= 0) {
+            currentHealth = 0;
+        } else {
+            currentHealth -= damage;
+        }
 
         healthBar.SetHealth(currentHealth);
     }
 
     public void UseMana(int mana) {
-        currentMana -= mana;
+        if (currentMana - mana <= 0) {
+            currentMana = 0;
+        } else {
+            currentMana -= mana;
+        }
 
         manaBar.SetMana(currentMana);
     }
