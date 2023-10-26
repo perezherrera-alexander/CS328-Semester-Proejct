@@ -26,6 +26,8 @@ public class Movement : MonoBehaviour
 
     bool isPaused;
 
+    private int dashes = 0;
+
     // Start is called before the first frame update
 
     void Start()
@@ -46,22 +48,28 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*
-        if (Input.GetKeyDown(KeyCode.Space))
+        if(isPaused) {
+            // This is just here to get rid of the warning
+        }
+
+        if (Input.GetKeyDown(KeyCode.J))
         {
             TakeDamage(1);
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (Input.GetKeyDown(KeyCode.K))
         {
             UseMana(1);
         }
-        */
+
     }
 
     // Called once per 0.2 seconds
     void FixedUpdate()
     {
+        if(dashes > 0) {
+            dashes--;
+        }
         float inputX = Input.GetAxis("Horizontal");
         float inputY = Input.GetAxis("Vertical");
 
@@ -71,6 +79,7 @@ public class Movement : MonoBehaviour
 
         LookAtMouse();
         HandleShooting();
+        HandleDash();
     }
 
     void LookAtMouse() {
@@ -118,5 +127,23 @@ public class Movement : MonoBehaviour
         }
 
         manaBar.SetMana(currentMana);
+    }
+
+    public void HandleDash() { // Dash in the direction of the mouse
+        if(dashes > 0) {
+            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 direction = mousePosition - rb.position;
+            direction.Normalize();            
+            rb.MovePosition(rb.position + (direction * 0.4f));
+            //rb.AddForce(direction * 10, ForceMode2D.Force);
+            // There's a better way to do this with AddForce, will revisit later
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            if(dashes == 0) {
+                Debug.Log("Dashing");
+                dashes = 10;
+            }
+        }
     }
 }
