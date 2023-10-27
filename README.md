@@ -2,6 +2,13 @@
 
 Unity Version: 2022.3.9f1 (LTS)
 
+### Vesion 0.2.2
+- Added Invisibility and Haste spells
+    - Invisibility makes the player invisible to enemies
+    - Haste increases the player's movement speed by double
+- Created Invisibility animation, having trouble implementing, will come back to it
+
+
 ### Vesion 0.2.1
 - Added dash mechanic to player controller
     - Not entirely happy with the implementation. There is a better way to do this, will revist later.

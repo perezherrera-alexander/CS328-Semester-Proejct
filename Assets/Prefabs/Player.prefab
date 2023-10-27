@@ -12,8 +12,11 @@ GameObject:
   - component: {fileID: 7775382828066136039}
   - component: {fileID: 178753887384531097}
   - component: {fileID: 8168541574964438627}
+  - component: {fileID: 3758452032966870713}
   - component: {fileID: 5088870707598306816}
   - component: {fileID: 4642418726759446956}
+  - component: {fileID: 8095123865957909243}
+  - component: {fileID: 1886081850322202829}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -142,6 +145,18 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &3758452032966870713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6108856926222607762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0514cb21357f52459c4cff90880c1f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!50 &5088870707598306816
 Rigidbody2D:
   serializedVersion: 4
@@ -204,3 +219,37 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.25
+--- !u!95 &8095123865957909243
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6108856926222607762}
+  m_Enabled: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e01a8fdf0f35e4a47a963ae3c84f8ef5, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1886081850322202829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6108856926222607762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 821e760de61251446861c3ad4b2fdc56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anim: {fileID: 8095123865957909243}
