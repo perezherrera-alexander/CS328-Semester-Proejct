@@ -7,6 +7,10 @@ using UnityEngine.AI;
 public class Movement : MonoBehaviour
 {
     public float movementSpeed;
+    public float dashSpeed = 200f;
+    public int dashDuration = 5; // In frames (0.2s) (1s)
+    public int dashCooldownTimer = 25; // In frames (0.2s) (5s)
+    public DashBar dashBar;
     private Rigidbody2D rb;
 
     public int maxHealth = 10;
@@ -26,15 +30,18 @@ public class Movement : MonoBehaviour
 
     bool isPaused;
 
-    private int dashes = 0;
+    private int dashCountdown = 0;
+    private int dashCooldown = 0;
+    private bool dashing = false;
 
     // Start is called before the first frame update
-
     void Start()
     {
         rb = this.GetComponent<Rigidbody2D>();
 
         movementSpeed /= 10;
+
+        dashBar.SetMaxDash(dashCooldownTimer);
 
         currentHealth = maxHealth;
         healthBar.SetMaxHealth(maxHealth);
@@ -67,25 +74,39 @@ public class Movement : MonoBehaviour
     // Called once per 0.2 seconds
     void FixedUpdate()
     {
-        if(dashes > 0) {
-            dashes--;
-        }
         float inputX = Input.GetAxis("Horizontal");
         float inputY = Input.GetAxis("Vertical");
+        Vector2 movement = new Vector2(inputX * movementSpeed, inputY * movementSpeed); // Movement vector
 
-        Vector2 movement = new Vector2(inputX * movementSpeed, inputY * movementSpeed);
+        rb.MovePosition(rb.position + movement); // Move the player
 
-        rb.MovePosition(rb.position + movement);
-
-        LookAtMouse();
+        // Get the player to look at the mouse
+        Vector2 aimDirection = GetDirectionToMouse(); // Saving this for later so that we don't compute it twice (in LookAtMouse() and in HandleDash())
+        rb.rotation = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg - 90f;
+        
         HandleShooting();
-        HandleDash();
+        if(dashing) {
+            dashCountdown--;
+        }
+        if(dashCooldown > 0) {
+            dashCooldown--;
+        }
+        HandleDash(aimDirection);
     }
 
-    void LookAtMouse() {
-        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    Vector2 GetMousePosition() { // Returns the mouse position in world coordinates
+        return Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    }
+
+    Vector2 GetDirectionToMouse() { // Returns the direction from the player to the mouse
+        Vector2 mousePosition = GetMousePosition();
         Vector2 direction = mousePosition - rb.position;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+        return direction;
+    }
+
+    void LookAtMouse() { // Moved this functionality into FixedUpdate() since it's trivial
+        Vector2 MouseDirection = GetDirectionToMouse();
+        float angle = Mathf.Atan2(MouseDirection.y, MouseDirection.x) * Mathf.Rad2Deg - 90f;
         rb.rotation = angle;
     }
 
@@ -129,21 +150,32 @@ public class Movement : MonoBehaviour
         manaBar.SetMana(currentMana);
     }
 
-    public void HandleDash() { // Dash in the direction of the mouse
-        if(dashes > 0) {
-            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector2 direction = mousePosition - rb.position;
-            direction.Normalize();            
-            rb.MovePosition(rb.position + (direction * 0.4f));
-            //rb.AddForce(direction * 10, ForceMode2D.Force);
-            // There's a better way to do this with AddForce, will revisit later
+    public void HandleDash(UnityEngine.Vector2 direction) { // Dash in the direction of the mouse
+        dashBar.SetDash(dashCooldown);
+        if(dashCountdown <= 0) {
+            dashing = false;
         }
-
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            if(dashes == 0) {
-                Debug.Log("Dashing");
-                dashes = 10;
+        if(Input.GetKey("space")) {
+            if(dashCooldown > 0)
+            {
+                // Debug.Log("Dash on cooldown");
             }
+            else
+            {
+                if(!dashing) {
+                    dashCountdown = dashDuration;
+                    dashCooldown = dashCooldownTimer;
+                    dashing = true;
+                    //Debug.Log("Dashing");
+                    direction.Normalize(); // Otherwise the dash is faster when the mouse is further away from the player          
+                    rb.AddForce(direction * dashSpeed, ForceMode2D.Force);
+                }
+            }
+            
+        }
+        if(dashing){
+            direction.Normalize(); // Otherwise the dash is faster when the mouse is further away from the player          
+            rb.AddForce(direction * dashSpeed, ForceMode2D.Force);
         }
     }
 }

@@ -134,6 +134,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 883d4495d85c5304a849bfa965d6ed46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &560708678 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5874799452920727941, guid: dbba0a6a06f3f7446a54b05e1907c51e, type: 3}
+  m_PrefabInstance: {fileID: 4112326737823995574}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30053b9dd6e9f594a86cfc4100b318e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1375080347
 GameObject:
   m_ObjectHideFlags: 0
@@ -322,10 +333,30 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3636592071551189266, guid: dbba0a6a06f3f7446a54b05e1907c51e, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3636592071551189266, guid: dbba0a6a06f3f7446a54b05e1907c51e, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6058734965486665642, guid: dbba0a6a06f3f7446a54b05e1907c51e, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 419385456094870383, guid: 0000000000000000d000000000000000, type: 0}
     - target: {fileID: 6058734965486665642, guid: dbba0a6a06f3f7446a54b05e1907c51e, type: 3}
       propertyPath: m_Name
       value: UI Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 6288613972340742645, guid: dbba0a6a06f3f7446a54b05e1907c51e, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+    - target: {fileID: 8272603795574360180, guid: dbba0a6a06f3f7446a54b05e1907c51e, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -340,9 +371,17 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 178753887384531097, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
+      propertyPath: dashBar
+      value: 
+      objectReference: {fileID: 560708678}
+    - target: {fileID: 178753887384531097, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
       propertyPath: manaBar
       value: 
       objectReference: {fileID: 2044495411}
+    - target: {fileID: 178753887384531097, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
+      propertyPath: dashSpeed
+      value: 200
+      objectReference: {fileID: 0}
     - target: {fileID: 178753887384531097, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
       propertyPath: healthBar
       value: 
@@ -355,6 +394,10 @@ PrefabInstance:
       propertyPath: movementSpeed
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6108856926222607762, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
     - target: {fileID: 6108856926222607762, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
       propertyPath: m_Name
       value: Player
@@ -509,6 +552,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5645062881560859981, guid: 6a517d3b355b02c42b16c0cf30100ae3, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5645062881560859981, guid: 6a517d3b355b02c42b16c0cf30100ae3, type: 3}
       propertyPath: m_Name
       value: LevelContainer

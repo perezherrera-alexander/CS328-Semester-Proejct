@@ -14,6 +14,8 @@ public class PlayerSpells : MonoBehaviour {
     bool canBeTargeted = true;
 
     void Start() {
+        if(canBeTargeted) // This is just here to get rid of the warning
+
         manaBar = GetComponent<ManaBar>();
         movement = GetComponent<Movement>();
     }
