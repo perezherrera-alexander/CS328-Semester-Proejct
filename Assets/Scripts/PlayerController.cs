@@ -82,8 +82,8 @@ public class Movement : MonoBehaviour
 
         // Get the player to look at the mouse
         Vector2 aimDirection = GetDirectionToMouse(); // Saving this for later so that we don't compute it twice (in LookAtMouse() and in HandleDash())
-        rb.rotation = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg - 90f;
         
+        LookAtMouse(aimDirection);
         HandleShooting();
         if(dashing) {
             dashCountdown--;
@@ -104,9 +104,8 @@ public class Movement : MonoBehaviour
         return direction;
     }
 
-    void LookAtMouse() { // Moved this functionality into FixedUpdate() since it's trivial
-        Vector2 MouseDirection = GetDirectionToMouse();
-        float angle = Mathf.Atan2(MouseDirection.y, MouseDirection.x) * Mathf.Rad2Deg - 90f;
+    void LookAtMouse(UnityEngine.Vector2 mouseDirection) { // Moved this functionality into FixedUpdate() since it's trivial
+        float angle = Mathf.Atan2(mouseDirection.y, mouseDirection.x) * Mathf.Rad2Deg - 90f;
         rb.rotation = angle;
     }
 

@@ -1405,6 +1405,14 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3636592071551189266, guid: dbba0a6a06f3f7446a54b05e1907c51e, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3636592071551189266, guid: dbba0a6a06f3f7446a54b05e1907c51e, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6058734965486665642, guid: dbba0a6a06f3f7446a54b05e1907c51e, type: 3}
       propertyPath: m_Name
       value: UI Canvas
@@ -1467,6 +1475,10 @@ PrefabInstance:
     - target: {fileID: 459567089465148837, guid: 6e92ea836480d3843a8fa2b6bdd6b995, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: Resume
+      objectReference: {fileID: 0}
+    - target: {fileID: 3070929694948402309, guid: 6e92ea836480d3843a8fa2b6bdd6b995, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3308569549753153722, guid: 6e92ea836480d3843a8fa2b6bdd6b995, type: 3}
       propertyPath: m_Name
@@ -1573,6 +1585,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6e92ea836480d3843a8fa2b6bdd6b995, type: 3}
+--- !u!114 &1563124928 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5874799452920727941, guid: dbba0a6a06f3f7446a54b05e1907c51e, type: 3}
+  m_PrefabInstance: {fileID: 1300395511}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30053b9dd6e9f594a86cfc4100b318e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1578668312
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1773,6 +1796,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 178753887384531097, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
+      propertyPath: dashBar
+      value: 
+      objectReference: {fileID: 1563124928}
     - target: {fileID: 178753887384531097, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
       propertyPath: manaBar
       value: 
