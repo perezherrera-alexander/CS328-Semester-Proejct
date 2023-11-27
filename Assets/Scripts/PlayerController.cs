@@ -22,6 +22,7 @@ public class Movement : MonoBehaviour
     public ManaBar manaBar;
 
     public GameObject bulletPrefab;
+    public WeaponType weaponType;
     public float bulletSpeed = 10f;
     public float shootingCooldown = 0.05f;
     private float nextShotTime = 0f;
@@ -85,6 +86,8 @@ public class Movement : MonoBehaviour
         
         LookAtMouse(aimDirection);
         HandleShooting();
+
+        // Dash Cooldown Handling
         if(dashing) {
             dashCountdown--;
         }
@@ -112,8 +115,18 @@ public class Movement : MonoBehaviour
     void HandleShooting() {
         if (Input.GetMouseButton(0) && Time.time > nextShotTime)  // Left mouse button
         {
-            Shoot();
-            nextShotTime = Time.time + shootingCooldown;
+            if(weaponType == WeaponType.Basic) {
+                Shoot();
+                nextShotTime = Time.time + shootingCooldown;
+            }
+            else if(weaponType == WeaponType.Beam) {
+                // TODO: Beam weapon
+                Debug.Log("Beam weapon");
+            }
+            else if(weaponType == WeaponType.Charge) {
+                // TODO: Charge weapon
+                Debug.Log("Charge weapon");
+            }
         }
     }
 
