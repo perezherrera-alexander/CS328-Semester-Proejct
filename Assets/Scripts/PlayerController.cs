@@ -35,6 +35,8 @@ public class Movement : MonoBehaviour
     private int dashCooldown = 0;
     private bool dashing = false;
 
+    private float maxBeamLength = 100f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -70,6 +72,15 @@ public class Movement : MonoBehaviour
             UseMana(1);
         }
 
+        if(weaponType == WeaponType.Basic) {
+            shootingCooldown = 0.05f;
+        }
+        else if(weaponType == WeaponType.Beam) {
+            shootingCooldown = 0f;
+        }
+        else if(weaponType == WeaponType.Charge) {
+            shootingCooldown = 0.1f;
+        }
     }
 
     // Called once per 0.2 seconds
@@ -85,7 +96,7 @@ public class Movement : MonoBehaviour
         Vector2 aimDirection = GetDirectionToMouse(); // Saving this for later so that we don't compute it twice (in LookAtMouse() and in HandleDash())
         
         LookAtMouse(aimDirection);
-        HandleShooting();
+        HandleShooting(aimDirection);
 
         // Dash Cooldown Handling
         if(dashing) {
@@ -104,6 +115,7 @@ public class Movement : MonoBehaviour
     Vector2 GetDirectionToMouse() { // Returns the direction from the player to the mouse
         Vector2 mousePosition = GetMousePosition();
         Vector2 direction = mousePosition - rb.position;
+        direction.Normalize();
         return direction;
     }
 
@@ -112,7 +124,7 @@ public class Movement : MonoBehaviour
         rb.rotation = angle;
     }
 
-    void HandleShooting() {
+    void HandleShooting(UnityEngine.Vector2 mouseDirection) {
         if (Input.GetMouseButton(0) && Time.time > nextShotTime)  // Left mouse button
         {
             if(weaponType == WeaponType.Basic) {
@@ -120,14 +132,71 @@ public class Movement : MonoBehaviour
                 nextShotTime = Time.time + shootingCooldown;
             }
             else if(weaponType == WeaponType.Beam) {
-                // TODO: Beam weapon
-                Debug.Log("Beam weapon");
+                FireBeam(mouseDirection);
+                nextShotTime = Time.time + shootingCooldown;
             }
             else if(weaponType == WeaponType.Charge) {
                 // TODO: Charge weapon
                 Debug.Log("Charge weapon");
             }
         }
+        else {
+            Destroy(GameObject.Find("Beam"));
+        }
+    }
+
+    void FireBeam(UnityEngine.Vector2 mouseDirection) {
+        // Create a new GameObject for the beam if it doesn't exist yet
+        GameObject beam = GameObject.Find("Beam");
+        LineRenderer lineRenderer;
+        BoxCollider2D collider; // Colider is here so that later on we can check if the beam hit anything
+        if(beam == null) {
+            beam = new GameObject("Beam");
+            lineRenderer = beam.AddComponent<LineRenderer>();
+            collider = beam.AddComponent<BoxCollider2D>();
+        }
+        else {
+            lineRenderer = beam.GetComponent<LineRenderer>();
+            collider = beam.GetComponent<BoxCollider2D>();
+        }
+
+        // Set other properties of the LineRenderer, such as color, width, etc.
+        lineRenderer.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+        lineRenderer.startColor = Color.blue;  
+        lineRenderer.endColor = Color.white;
+        lineRenderer.startWidth = 0.2f;
+        lineRenderer.endWidth = 0.2f;
+        float alpha = 1.0f;
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new GradientColorKey[] { new GradientColorKey(lineRenderer.startColor, 0.0f), new GradientColorKey(lineRenderer.endColor, 1.0f) },
+            new GradientAlphaKey[] { new GradientAlphaKey(alpha, 0.0f), new GradientAlphaKey(alpha, 1.0f) }
+        );
+        lineRenderer.colorGradient = gradient;
+
+        
+        
+
+        // Offset the beam's start position so that it doesn't collide with the player
+        Vector3 beamOffset = new Vector3(0f, 0.5f, 0f);
+        beamOffset = Quaternion.Euler(0, 0, rb.rotation) * beamOffset;
+        lineRenderer.SetPosition(0, transform.position + beamOffset);
+
+        // Ignore collisions between the beam and the player
+        Physics2D.IgnoreCollision(collider, GetComponent<CircleCollider2D>());
+        // Raycast to the nearest object in the direction of the mouse and only look for walls and enemies
+        LayerMask mask = LayerMask.GetMask("Wall", "Enemy"); // Layer 8 & 9
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, maxBeamLength, mask);
+
+        if (hit.collider != null) { // If the raycast hit something, update the beam's end position and the collider's size
+            lineRenderer.SetPosition(1, hit.point);
+            collider.size = new Vector2(0.2f, hit.distance);
+        } else { // In case we don't hit anything, just make the beam (and collider) really long
+            lineRenderer.SetPosition(1, transform.position + transform.up * maxBeamLength);
+            collider.size = new Vector2(0.2f, maxBeamLength);
+        }
+
+        // No need to destroy the beam, we'll reuse it as long as the player is holding down click. We'll destroy it later on if the player stop's clicking
     }
 
     void Shoot() {
