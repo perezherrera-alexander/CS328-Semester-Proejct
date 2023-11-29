@@ -103,7 +103,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -180,13 +180,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1199600018106073327}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea5cc70721191524ab681796424743a2, type: 3}
+  m_Script: {fileID: 11500000, guid: 7d072b74a0f77e9428bb2560e90fb6f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  speed: 2
-  rotateSpeed: 0.075
-  attackCooldown: 0
+  speed: 3
+  rotateSpeed: 0.05
+  attackCooldown: 1
   lastAttackTime: 0
-  health: 6
+  health: 10
   playerController: {fileID: 0}
+  skeletonState: 0
+  reviveTime: 5

@@ -17,7 +17,7 @@ public class BulletBehavior : MonoBehaviour
         {
             Destroy(gameObject); // Then destroy it
         }
-        else if (collision.gameObject.tag == "Enemy")
+        else if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Goblin"))
         {
             
             Destroy(gameObject);

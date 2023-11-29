@@ -1,79 +1,112 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class SkeletonAI : EnemyAI
 {
-    private bool isDead = false;
-    private bool isOnGround = false;
-    private float reanimationTime = 5f; // Adjust as needed
-    private float timeSinceDeath = 0f;
+
+    public enum SkeletonState
+    {
+        Walking,
+        Dropping,
+        PileOfBones
+    }
+    public SkeletonState skeletonState = SkeletonState.Walking;
+    private int deathCount = 0;
+    public float reviveTime = 5f;
+    private float reviveTimer = 0f;
+    private int maxHealth;
+    private int pileOfBonesHealth;
 
     protected override void Start()
     {
         base.Start();
 
+        maxHealth = health;
+        pileOfBonesHealth = maxHealth / 2;
     }
 
     protected override void Update()
     {
         base.Update();
-
-        if (!isDead && !isOnGround)
-        {
-            // Check if the Skeleton can see the player
-            if (CanSeePlayer())
-            {
-                ChasePlayer();
-            } 
-            else
-            {
-                RandomMovement();
-            }
-        }
-
-        if (isDead && !isOnGround)
-        {
-            // Check if the Skeleton has been on the ground for the set reanimation time
-            timeSinceDeath += Time.deltaTime;
-            if (timeSinceDeath >= reanimationTime)
-            {
-                Reanimate();
-            }
+        switch(skeletonState){
+            case SkeletonState.Walking:
+                if (CanSeePlayer())
+                {
+                    ChasePlayer();
+                }
+                break;
+            case SkeletonState.Dropping:
+                rb.velocity = Vector2.zero;
+                reviveTimer = 0;
+                skeletonState = SkeletonState.PileOfBones;
+                rb.freezeRotation = true;
+                break;
+            case SkeletonState.PileOfBones:
+                rb.velocity = Vector2.zero;
+                reviveTimer += Time.deltaTime;
+                if(reviveTimer >= reviveTime){
+                    skeletonState = SkeletonState.Walking;
+                    health = maxHealth;
+                    rb.freezeRotation = false;
+                }
+                break;
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    protected override void FixedUpdate()
     {
-        // Check if the Skeleton collides with a damaging object (e.g., player's attack)
-        if (other.CompareTag("DamagingObject"))
+        if (skeletonState == SkeletonState.Walking)
         {
-            if (!isDead)
+            base.FixedUpdate();
+        }
+        else
+        {
+            rb.velocity = Vector2.zero;
+        }
+    }
+
+    protected override void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("DamagingObject"))
+        {
+            health--;
+            if (health <= 0)
             {
                 Die();
             }
-            else if (isOnGround)
+        }
+        else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown)
+        {
+            playerController.TakeDamage(1);
+        }
+    }
+
+    protected override void Die()
+    {
+        //Debug.Log("Skeleton died");
+        if(skeletonState == SkeletonState.Walking){
+            skeletonState = SkeletonState.Dropping;
+            health = pileOfBonesHealth;
+        }
+        else if(skeletonState == SkeletonState.PileOfBones){
+            deathCount++;
+            //Debug.Log("Skeleton death count: " + deathCount);
+            if (deathCount >= 2)
             {
-                // If the Skeleton is on the ground and gets hit again, reanimate
-                Reanimate();
+                //Debug.Log("Died for real");
+                Destroy(gameObject);
+            }
+            else
+            {
+                //health = pileOfBonesHealth;
+                //skeletonState = SkeletonState.Walking;
             }
         }
     }
 
-    private void RandomMovement()
+    void ChasePlayer()
     {
-        if (!isDead && !isOnGround)
-        {
-            // Generate a random direction
-            Vector2 randomDirection = Random.insideUnitCircle.normalized;
-            MoveTowardsTarget(randomDirection);
-        }
-    }
-
-    private void ChasePlayer()
-    {
-        // If the Skeleton can see the player, move towards the player
         if (target != null)
         {
             Vector2 directionToPlayer = target.position - transform.position;
@@ -81,7 +114,7 @@ public class SkeletonAI : EnemyAI
         }
     }
 
-    private bool CanSeePlayer()
+    bool CanSeePlayer()
     {
         // Raycast to check if there's a clear line of sight to the player
         if (target != null)
@@ -101,36 +134,5 @@ public class SkeletonAI : EnemyAI
 
         // Player is not in line of sight
         return false;
-    }
-
-    protected override void Die()
-    {
-        isDead = true;
-        // Collapse the Skeleton to the ground (play animation, set appropriate state, etc.)
-        // For demonstration purposes, we're just deactivating the GameObject after a delay
-        StartCoroutine(CollapseAndDeactivate());
-    }
-
-    private void Reanimate()
-    {
-        // Reanimate the Skeleton (play animation, set appropriate state, etc.)
-        // For demonstration purposes, we're just resetting the state and reactivating the GameObject
-        isDead = false;
-        isOnGround = false;
-        timeSinceDeath = 0f;
-        gameObject.SetActive(true);
-    }
-
-    private IEnumerator CollapseAndDeactivate()
-    {
-        // Play the collapse animation or perform any other necessary actions
-        // For demonstration purposes, we're just deactivating the GameObject after a delay
-        yield return new WaitForSeconds(1f); // Adjust the delay as needed
-
-        // Set the Skeleton as on the ground
-        isOnGround = true;
-
-        // Deactivate the GameObject
-        gameObject.SetActive(false);
     }
 }
