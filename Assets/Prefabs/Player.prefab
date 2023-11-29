@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 1886081850322202829}
   m_Layer: 6
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -77,8 +77,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 755275367
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -104,6 +104,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeed: 1
+  dashSpeed: 200
+  dashDuration: 5
+  dashCooldownTimer: 25
+  dashBar: {fileID: 0}
   maxHealth: 10
   currentHealth: 0
   healthBar: {fileID: 0}
@@ -111,6 +115,7 @@ MonoBehaviour:
   currentMana: 0
   manaBar: {fileID: 0}
   bulletPrefab: {fileID: 8620902242178562404, guid: 4cf024747222bc64b878adcd935f8d48, type: 3}
+  weaponType: 0
   bulletSpeed: 9
   shootingCooldown: 0.05
   randomAngleRange: 6
