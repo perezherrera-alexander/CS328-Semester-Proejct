@@ -76,7 +76,7 @@ public class SkeletonAI : EnemyAI
                 Die();
             }
         }
-        else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown)
+        else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown && skeletonState == SkeletonState.Walking)
         {
             playerController.TakeDamage(1);
         }

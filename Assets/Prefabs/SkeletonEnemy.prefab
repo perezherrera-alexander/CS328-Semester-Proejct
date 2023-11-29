@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 8236998613734873267}
   m_Layer: 0
   m_Name: SkeletonEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -184,11 +184,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  speed: 3
+  speed: 2
   rotateSpeed: 0.05
   attackCooldown: 1
   lastAttackTime: 0
-  health: 10
+  health: 5
   playerController: {fileID: 0}
   skeletonState: 0
   reviveTime: 5
