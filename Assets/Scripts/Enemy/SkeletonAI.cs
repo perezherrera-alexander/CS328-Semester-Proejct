@@ -1,24 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class SkeletonAI : EnemyAI
 {
-    /*
     private bool isDead = false;
     private bool isOnGround = false;
-    private float reanimationTime = 10f; // Adjust as needed
+    private float reanimationTime = 5f; // Adjust as needed
     private float timeSinceDeath = 0f;
 
     protected override void Start()
     {
         base.Start();
-        speed = 1f; // Slow speed for the Skeleton
-        InvokeRepeating("RandomMovement", 0f, 3f); // Invoke RandomMovement every 3 seconds
+
     }
 
-    void Update()
+    protected override void Update()
     {
+        base.Update();
+
         if (!isDead && !isOnGround)
         {
             // Check if the Skeleton can see the player
@@ -43,7 +44,7 @@ public class SkeletonAI : EnemyAI
         }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         // Check if the Skeleton collides with a damaging object (e.g., player's attack)
         if (other.CompareTag("DamagingObject"))
@@ -60,7 +61,7 @@ public class SkeletonAI : EnemyAI
         }
     }
 
-    void RandomMovement()
+    private void RandomMovement()
     {
         if (!isDead && !isOnGround)
         {
@@ -70,7 +71,7 @@ public class SkeletonAI : EnemyAI
         }
     }
 
-    void ChasePlayer()
+    private void ChasePlayer()
     {
         // If the Skeleton can see the player, move towards the player
         if (target != null)
@@ -80,7 +81,7 @@ public class SkeletonAI : EnemyAI
         }
     }
 
-    bool CanSeePlayer()
+    private bool CanSeePlayer()
     {
         // Raycast to check if there's a clear line of sight to the player
         if (target != null)
@@ -102,7 +103,7 @@ public class SkeletonAI : EnemyAI
         return false;
     }
 
-    void Die()
+    protected override void Die()
     {
         isDead = true;
         // Collapse the Skeleton to the ground (play animation, set appropriate state, etc.)
@@ -110,7 +111,7 @@ public class SkeletonAI : EnemyAI
         StartCoroutine(CollapseAndDeactivate());
     }
 
-    void Reanimate()
+    private void Reanimate()
     {
         // Reanimate the Skeleton (play animation, set appropriate state, etc.)
         // For demonstration purposes, we're just resetting the state and reactivating the GameObject
@@ -120,7 +121,7 @@ public class SkeletonAI : EnemyAI
         gameObject.SetActive(true);
     }
 
-    IEnumerator CollapseAndDeactivate()
+    private IEnumerator CollapseAndDeactivate()
     {
         // Play the collapse animation or perform any other necessary actions
         // For demonstration purposes, we're just deactivating the GameObject after a delay
@@ -132,5 +133,4 @@ public class SkeletonAI : EnemyAI
         // Deactivate the GameObject
         gameObject.SetActive(false);
     }
-    */
 }

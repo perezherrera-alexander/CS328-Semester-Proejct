@@ -9,7 +9,7 @@ public class EnemyAI : MonoBehaviour {
     public float rotateSpeed = 0.05f;
     protected Rigidbody2D rb;
     public float attackCooldown = 1f; // Add attack cooldown duration
-    private float lastAttackTime; // Track the last attack time
+    public float lastAttackTime; // Track the last attack time
 
     public int health = 10;
 
@@ -88,5 +88,16 @@ public class EnemyAI : MonoBehaviour {
     protected virtual void Die()
     {
         Destroy(gameObject);
+    }
+
+    protected virtual void MoveTowardsTarget(Vector2 direction)
+    {
+        // Move towards the target
+        rb.velocity = direction.normalized * speed;
+
+        // Rotate towards the target
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+        Quaternion q = Quaternion.Euler(new Vector3(0, 0, angle));
+        transform.localRotation = Quaternion.Slerp(transform.localRotation, q, rotateSpeed);
     }
 }

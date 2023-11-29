@@ -4,238 +4,155 @@ using UnityEngine;
 
 public class GoblinAI : EnemyAI
 {
-    /*
     private bool isInPack = false;
     private bool isAttacking = false;
-    private float obstacleAvoidanceRadius = 2f; // Adjust as needed
+    private float goblinCheckRadius = 15f; // Adjust as needed
     private bool isRandomMovementScheduled = false;
+    private bool isCloseToGoblin = false;
 
     protected override void Start()
     {
         base.Start();
-
-        speed = 3f;
-        checkRadius = 20f;
-        InvokeRepeating("RandomMovement", 0f, 3f); // Invoke RandomMovement every 3 seconds
     }
 
-    void Update()
+    protected override void Update()
     {
-        Collider2D[] enemies = CheckForEnemies();
+        base.Update();
+    }
 
-        if (enemies.Length > 0)
-        {
-            foreach (var enemy in enemies)
-            {
-                if (enemy.CompareTag("Player"))
-                {
-                    RunAway();
-                }
-                else if (enemy.CompareTag("Goblin") && !isInPack)
-                {
-                    GroupUp();
-                }
-            }
-        }
-        else
+    protected override void FixedUpdate()
+    {
+        rb.velocity = transform.up * speed;
+
+        if (lastAttackTime > attackCooldown)
         {
             isAttacking = false;
+        } else if (lastAttackTime < attackCooldown)
+        {
+            isAttacking = true;
+        }
+
+        if (target != null)
+        {
+            if (isAttacking)
+            {
+                // If the Goblin is attacking, do not perform other actions
+                return;
+            }
+
+            if (CanSeePlayer())
+            {
+                // If the Goblin is in a pack, chase the player
+                if (isInPack && isCloseToGoblin)
+                {
+                    RotateToTarget();
+                }
+                else if (isInPack && !isCloseToGoblin)
+                {
+                    MoveToGoblin();
+                }
+                else if (!isInPack)
+                {
+                    // If the Goblin is not in a pack, move away from the player
+                    MoveAwayFromTarget(target.position);
+                    // If the Goblin is not in a pack, check if there are other Goblins nearby
+                    SenseOtherGoblins();
+                }
+            } 
+            else
+            {
+                // If the Goblin cannot see the player, check if there are other Goblins nearby
+                SenseOtherGoblins();
+            }
         }
     }
 
-    void FixedUpdate()
+    private bool CanSeePlayer ()
     {
-        // Update the target (player) reference
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+        // Raycast to check if there's a clear line of sight to the player
+        if (target != null)
         {
-            target = player.transform;
+            Vector2 directionToPlayer = target.position - transform.position;
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, Mathf.Infinity, LayerMask.GetMask("Player"));
+
+            if (hit.collider != null && hit.collider.CompareTag("Wall"))
+            {
+                return false;
+            }
+            else if (hit.collider != null && hit.collider.CompareTag("Player"))
+            {
+                // Player is in line of sight
+                return true;
+            }
         }
 
-        // Check for enemies and perform appropriate actions
-        Collider2D[] enemies = CheckForEnemies();
+        return false;
+    }
 
-        if (enemies.Length > 0)
+    private void SenseOtherGoblins() 
+    {
+        Collider2D[] goblins = Physics2D.OverlapCircleAll(transform.position, goblinCheckRadius, LayerMask.GetMask("Goblin"));
+
+        if (goblins.Length > 1)
         {
-            foreach (var enemy in enemies)
-            {
-                if (enemy.CompareTag("Player"))
-                {
-                    RunAway();
-                }
-                else if (enemy.CompareTag("Goblin") && !isInPack)
-                {
-                    GroupUp();
-                }
-            }
+            // If there are other Goblins nearby, join the pack
+            isInPack = true;
+            MoveToGoblin();
         }
         else
         {
-            isAttacking = false;
+            // If there are no other Goblins nearby, move randomly
+            isInPack = false;
+        }
+    }
+
+    private void MoveToGoblin()
+    {
+        // Find the closest Goblin
+        Collider2D[] goblins = Physics2D.OverlapCircleAll(transform.position, goblinCheckRadius, LayerMask.GetMask("Goblin"));
+        float closestDistance = Mathf.Infinity;
+        Transform closestGoblin = null;
+
+        foreach (Collider2D goblin in goblins)
+        {
+            if (goblin.gameObject != gameObject)
+            {
+                float distance = Vector2.Distance(transform.position, goblin.transform.position);
+
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestGoblin = goblin.transform;
+                }
+            }
         }
 
-        // If in a pack and the player is in attack radius, attack the player
-        if (isInPack && target != null && target.CompareTag("Player"))
+        // Move towards the closest Goblin
+        if (closestGoblin != null)
         {
-            float distanceToPlayer = Vector2.Distance(transform.position, target.position);
+            Vector2 directionToGoblin = closestGoblin.position - transform.position;
+            MoveTowardsTarget(directionToGoblin);
+        }
 
-            if (distanceToPlayer <= attackRadius)
-            {
-                AttackPlayer();
-            }
+        // Check if the Goblin is close to the closest Goblin
+        if (closestDistance <= 3f)
+        {
+            isCloseToGoblin = true;
         }
         else
         {
-            // If not in a pack or not targeting the player, perform random movement
-            if (!isRandomMovementScheduled)
-            {
-                StartCoroutine(ScheduleRandomMovement());
-            }
+            isCloseToGoblin = false;
         }
     }
 
-    IEnumerator ScheduleRandomMovement()
+    private void MoveAwayFromTarget(Vector2 direction)
     {
-        isRandomMovementScheduled = true;
-        yield return new WaitForSeconds(Random.Range(1f, 3f)); // Adjust the time interval as needed
-        RandomMovement();
-        isRandomMovementScheduled = false;
+        // Move away from the target
+        rb.velocity = -direction.normalized * speed;
+
+        // Rotate away from the target
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+        Quaternion q = Quaternion.Euler(new Vector3(0, 0, angle));
+        transform.localRotation = Quaternion.Slerp(transform.localRotation, q, rotateSpeed);
     }
-
-    void RandomMovement()
-    {
-        if (!isInPack)
-        {
-            // Generate a random direction
-            Vector2 randomDirection = Random.insideUnitCircle.normalized;
-
-            // Cast a ray to check for obstacles
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, randomDirection, obstacleAvoidanceRadius, LayerMask.GetMask("Wall"));
-
-            if (hit.collider == null)
-            {
-                // No obstacle, move in the random direction
-                MoveTowardsTarget(randomDirection);
-            }
-            else
-            {
-                // Obstacle detected, do not perform another random movement immediately
-                // Adjust the interval and schedule the next random movement
-                StartCoroutine(ScheduleRandomMovement());
-            }
-        }
-    }
-
-    void GroupUp()
-    {
-        Collider2D[] nearbyGoblins = Physics2D.OverlapCircleAll(transform.position, checkRadius, LayerMask.GetMask("Goblin"));
-
-        if (nearbyGoblins.Length > 1)
-        {
-            // Find the nearest goblin
-            Transform nearestGoblin = null;
-            float shortestDistance = float.MaxValue;
-
-            foreach (var goblin in nearbyGoblins)
-            {
-                if (goblin.transform != transform)
-                {
-                    float distance = Vector2.Distance(transform.position, goblin.transform.position);
-                    if (distance < shortestDistance)
-                    {
-                        shortestDistance = distance;
-                        nearestGoblin = goblin.transform;
-                    }
-                }
-            }
-
-            // Move towards the nearest goblin
-            if (nearestGoblin != null)
-            {
-                Vector2 directionToNearestGoblin = nearestGoblin.position - transform.position;
-
-                // Cast a ray to check for obstacles
-                RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToNearestGoblin.normalized, obstacleAvoidanceRadius, LayerMask.GetMask("Wall"));
-
-                if (hit.collider == null)
-                {
-                    // No obstacle, move towards the nearest goblin
-                    MoveTowardsTarget(directionToNearestGoblin);
-                }
-                else
-                {
-                    // Obstacle detected, do not perform another random movement immediately
-                    // Adjust the interval and schedule the next random movement
-                    StartCoroutine(ScheduleRandomMovement());
-                }
-            }
-        }
-
-        // For simplicity, add a delay before the goblin starts moving randomly again
-        Invoke("ResumeRandomMovement", 5f);
-    }
-
-    void ResumeRandomMovement()
-    {
-        isInPack = true;
-        InvokeRepeating("RandomMovement", 0f, 3f);
-    }
-
-    void RunAway()
-    {
-        if (isInPack)
-        {
-            Vector2 directionToPlayer = transform.position - target.position;
-
-            // Cast a ray to check for obstacles
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer.normalized, obstacleAvoidanceRadius, LayerMask.GetMask("Wall"));
-
-            if (hit.collider == null)
-            {
-                // No obstacle, move away from the player
-                MoveTowardsTarget(directionToPlayer);
-            }
-            else
-            {
-                // Obstacle detected, do not perform another random movement immediately
-                // Adjust the interval and schedule the next random movement
-                StartCoroutine(ScheduleRandomMovement());
-            }
-        }
-        else
-        {
-            // If not in a pack, run away from the player
-            if (target != null && target.CompareTag("Player"))
-            {
-                Vector2 directionToPlayer = transform.position - target.position;
-
-                // Cast a ray to check for obstacles
-                RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer.normalized, obstacleAvoidanceRadius, LayerMask.GetMask("Wall"));
-
-                if (hit.collider == null)
-                {
-                    // No obstacle, run away from the player
-                    MoveTowardsTarget(directionToPlayer);
-                }
-                else
-                {
-                    // Obstacle detected, do not perform another random movement immediately
-                    // Adjust the interval and schedule the next random movement
-                    StartCoroutine(ScheduleRandomMovement());
-                }
-            }
-            else
-            {
-                // If the target is not the player, perform random movement
-                StartCoroutine(ScheduleRandomMovement());
-            }
-        }
-    }
-
-    void AttackPlayer()
-    {
-        // Implement logic for attacking the player
-        isAttacking = true;
-    }
-    */
 }

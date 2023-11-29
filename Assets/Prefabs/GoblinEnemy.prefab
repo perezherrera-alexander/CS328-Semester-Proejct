@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7228026702186000001}
   - component: {fileID: 4535197304712231893}
   - component: {fileID: 7141554690106851010}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: GoblinEnemy
   m_TagString: Goblin
   m_Icon: {fileID: 0}
@@ -185,4 +185,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   speed: 4
-  rotateSpeed: 0.05
+  rotateSpeed: 0.075
+  attackCooldown: 0
+  lastAttackTime: 0
+  health: 3
+  playerController: {fileID: 0}
