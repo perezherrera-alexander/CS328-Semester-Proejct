@@ -7,6 +7,7 @@ TagManager:
   - Wall
   - Goblin
   - DamagingObject
+  - Enemy
   layers:
   - Default
   - TransparentFX
