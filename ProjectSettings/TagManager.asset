@@ -9,6 +9,7 @@ TagManager:
   - DamagingObject
   - Enemy
   - Boss
+  - Invisible
   layers:
   - Default
   - TransparentFX
