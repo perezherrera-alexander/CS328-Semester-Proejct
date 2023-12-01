@@ -160,6 +160,6 @@ public class GoblinAI : EnemyAI
         base.Die(); 
 
         // Give player back mana
-        playerController.currentMana += 3;
+        playerController.currentMana += 15;
     }
 }

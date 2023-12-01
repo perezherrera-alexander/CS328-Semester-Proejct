@@ -77,8 +77,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: 5b8d282ed32f00e4e99709787130d082, type: 3}
-  m_Color: {r: 0.6792453, g: 0.6113208, b: 0.6113208, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 055916fd8258a0748bddd2ab2ca1a959, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -188,7 +188,10 @@ MonoBehaviour:
   rotateSpeed: 0.05
   attackCooldown: 1
   lastAttackTime: 0
-  health: 5
+  health: 6
   playerController: {fileID: 0}
+  enemyDeathSound: {fileID: 8300000, guid: 3ce4cfdfd955494428f73fb4784bc9cb, type: 3}
   skeletonState: 0
-  reviveTime: 5
+  reviveTime: 0.5
+  walkingSprite: {fileID: 21300000, guid: 055916fd8258a0748bddd2ab2ca1a959, type: 3}
+  pileOfBonesSprite: {fileID: 21300000, guid: 5bab58df5c6b37b4b87c63edab832664, type: 3}

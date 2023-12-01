@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 755275367
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9b7b1597b9ea06a4383717a998123df5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -114,7 +114,7 @@ MonoBehaviour:
   maxMana: 100
   currentMana: 0
   manaBar: {fileID: 0}
-  manaRegenRate: 0.02
+  manaRegenRate: 0.1
   manaEmptyCooldown: 250
   manaCooldownTimer: 0
   bulletPrefab: {fileID: 8620902242178562404, guid: 4cf024747222bc64b878adcd935f8d48, type: 3}
