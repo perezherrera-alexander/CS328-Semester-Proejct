@@ -6,7 +6,7 @@ public class GoblinAI : EnemyAI
 {
     private bool isInPack = false;
     private bool isAttacking = false;
-    private float goblinCheckRadius = 10f; // Adjust as needed
+    private float goblinCheckRadius = 15f; // Adjust as needed
     private bool isCloseToGoblin = false;
 
     protected override void Start()
