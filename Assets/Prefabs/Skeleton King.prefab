@@ -208,5 +208,5 @@ MonoBehaviour:
   meleeSpeedBuff: 1.5
   lowHealthSpeedBuff: 1.75
   attackRange: 10
-  meleeRange: 5
+  meleeRange: 3
   bossState: 0

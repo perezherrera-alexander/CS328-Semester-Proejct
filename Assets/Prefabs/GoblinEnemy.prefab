@@ -188,6 +188,6 @@ MonoBehaviour:
   rotateSpeed: 0.075
   attackCooldown: 0
   lastAttackTime: 0
-  health: 3
+  health: 4
   playerController: {fileID: 0}
   enemyDeathSound: {fileID: 8300000, guid: 3ce4cfdfd955494428f73fb4784bc9cb, type: 3}
