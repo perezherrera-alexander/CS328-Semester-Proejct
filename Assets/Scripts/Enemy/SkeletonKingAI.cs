@@ -1,40 +1,34 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class SkeletonKingAI : BossAI
 {
-    public enum BossState
-    {
-        Attacking,
-        Dead
-    }
+    [SerializeField] private GameObject skeletonPrefab; // Skeleton prefab to be thrown
+    [SerializeField] private GameObject boundary; // Reference to the boundary GameObject
 
-    public enum AttackType
-    {
-        Melee,
-        Ranged
-    }
+    private List<GameObject> skeletons; // List of skeletons thrown by the Skeleton King
+    private GameObject parentObject; // Parent GameObject for the skeletons
+    private int throwForce = 10; // Force applied to the skeleton when thrown
 
-    [SerializeField] private GameObject skeletonPrefab;
-    public BossState currentState = BossState.Attacking;
-    public AttackType currentAttackType = AttackType.Melee;
-    public float rangedAttackTimer = 5f;
-    public float rangedAttackCooldown = 5f;
-    public float throwForce = 10f;
+    public float rangedAttackCooldown = 3f; // Cooldown between ranged attacks
+    private float rangedAttackTimer = 3f; // Timer for ranged attacks
 
-    private List<GameObject> skeletons = new List<GameObject>();
-    private GameObject parentObject;
+    public float meleeSpeedBuff = 1.2f; // Marginal speed buff in melee mode
+    public float lowHealthSpeedBuff = 1.75f; // Bigger speed buff when below 15% health
+    public float attackRange = 10f; // Range for ranged attacks
+    public float meleeRange = 5f; // Range for switching to melee mode
+    private float originalSpeed; // Store the original speed for later use
+
+    private bool isMeleeMode = false;
 
     protected override void Start()
     {
         base.Start();
+        
+        originalSpeed = speed;
 
-        parentObject = new GameObject("Thrown Skeletons");
-
-        skeletons = new List<GameObject>();
+        parentObject = new GameObject("Thrown Skeletons"); // Create a new GameObject to parent the skeletons
+        skeletons = new List<GameObject>(); // Initialize the list of skeletons
     }
 
     protected override void Update()
@@ -44,104 +38,104 @@ public class SkeletonKingAI : BossAI
 
     protected override void FixedUpdate()
     {
-        base.FixedUpdate();
-
         if (rangedAttackTimer > 0f)
         {
-            rangedAttackTimer -= Time.fixedDeltaTime;
+            rangedAttackTimer -= Time.deltaTime;
         }
 
-        if (currentState != BossState.Attacking && IsPlayerTooClose())
+        if (/*IsPlayerInBox() &&*/ health > 0)
         {
-            BackUp();
-        } 
-        else if (currentState != BossState.Attacking && !IsPlayerTooClose())
-        {
-            RotateToTarget();
-        } 
-        else if (currentState == BossState.Attacking)
-        {
-            if (currentAttackType == AttackType.Melee)
+            if (health <= maxHealth * 0.15f) // If the Skeleton King is below 15% health
             {
-                // Implement your logic for melee attack here
-                RotateToTarget();
-
-                speed *= 1.25f; // Increase the speed of the boss
+                speed = originalSpeed * lowHealthSpeedBuff;
             }
-            else if (currentAttackType == AttackType.Ranged)
+
+            if (Vector2.Distance(transform.position, target.position) < meleeRange)
             {
-                // Implement your logic for ranged attack here
-                FaceTarget();
+                isMeleeMode = true;
+                speed = originalSpeed * meleeSpeedBuff; 
+            }
+            else
+            {
+                isMeleeMode = false;
+                speed = originalSpeed;
+            }
 
-                RangedAttack();
+            if (isMeleeMode || health <= maxHealth * 0.5f)
+            {
+                MeleeMode();
+            }
+            else
+            {
+                RangedMode();
             }
         }
-
-        DetermineAttackType();
     }
 
-    private void RangedAttack()
+    private bool IsPlayerInBox()
     {
-        if (rangedAttackTimer <= 0f) // Check if cooldown is over
+        // Check if the player is within the specified box
+        float boxSize = 15f;
+
+        // Use the boundary GameObject to check if the boss is within the specified boundary
+        Collider2D boundaryCollider = boundary.GetComponent<Collider2D>();
+        bool isInBoundary = Physics2D.OverlapBox(transform.position, new Vector2(boxSize, boxSize), 0f, 1 << boundaryCollider.gameObject.layer);
+
+        return isInBoundary &&
+               Mathf.Abs(transform.position.x - target.position.x) < boxSize * 0.5f &&
+               Mathf.Abs(transform.position.y - target.position.y) < boxSize * 0.5f;
+    }
+
+    private void RangedMode()
+    {
+        // Mirror the player's movements
+        Vector2 mirroredDirection = -(target.position - transform.position).normalized;
+        MoveTowardsTarget(mirroredDirection);
+
+        // Check for ranged attack conditions and throw a skeleton if necessary
+        if (rangedAttackTimer <= 0f)
         {
-            // Instantiate a new skeleton GameObject
-            GameObject skeleton = Instantiate(skeletonPrefab, transform.position, Quaternion.identity);
-            parentObject.transform.position = transform.position;
-            skeleton.transform.parent = parentObject.transform;
-            skeletons.Add(skeleton);
+            ThrowSkeleton();
 
-            // Calculate the direction towards the player
-            Vector2 direction = (target.position - transform.position).normalized;
+            rangedAttackTimer = rangedAttackCooldown; // Reset the ranged attack timer
+        }
 
-            // Apply force to the skeleton to throw it towards the player
-            Rigidbody2D skeletonRigidbody = skeleton.GetComponent<Rigidbody2D>();
-            skeletonRigidbody.AddForce(direction * throwForce, ForceMode2D.Impulse);
+        // Check if the Skeleton King is cornered and switch to melee mode
+        // CheckForCornered();
+    }
 
-            rangedAttackTimer = rangedAttackCooldown; // Start cooldown
+    private void MeleeMode()
+    {
+        // Move towards the player in melee mode
+        MoveTowardsTarget(target.position - transform.position);
+    }
+
+    private void CheckForCornered()
+    {
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, new Vector2(2f, 2f), 0f);
+        foreach (Collider2D collider in colliders)
+        {
+            if (collider.CompareTag("Wall") && (collider.CompareTag("Player") && Vector2.Distance(transform.position, target.position) < 6f))
+            {
+                isMeleeMode = true;
+                return;
+            }
         }
     }
 
-    private void DetermineAttackType()
+    private void ThrowSkeleton()
     {
-        if (health <= 50)
-        {
-            currentAttackType = AttackType.Ranged;
-        } 
-        else
-        {
-            currentAttackType = AttackType.Melee;
-        }
-        
-        if (IsPlayerTooClose())
-        {
-            currentAttackType = AttackType.Melee;
-        }
-        else
-        {
-            currentAttackType = AttackType.Ranged;
-        }
-    }
+        // Instantiate a new skeleton GameObject
+        GameObject skeleton = Instantiate(skeletonPrefab, transform.position, Quaternion.identity);
+        parentObject.transform.position = transform.position;
+        skeleton.transform.parent = parentObject.transform;
+        skeletons.Add(skeleton);
 
-    private void FaceTarget() 
-    {
-        Vector2 targetDir = target.position - transform.position;
-        float angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg - 90f;
-        Quaternion q = Quaternion.Euler(new Vector3(0, 0, angle));
-        transform.rotation = q; // Only update the rotation without interpolation
-    }
+        // Calculate the direction towards the player
+        Vector2 direction = (target.position - transform.position).normalized;
 
-    private bool IsPlayerTooClose()
-    {
-        float distanceToPlayer = Vector2.Distance(transform.position, target.position);
-        float desiredDistance = 5f; // Set your desired distance here
-
-        return distanceToPlayer < desiredDistance;
-    }
-
-    private void BackUp()
-    {
-        // Implement your logic for backing up here
-        // For example, you can move the boss backwards
-        transform.Translate(Vector3.back * Time.deltaTime * speed);
+        // Apply force to the skeleton to throw it towards the player
+        Rigidbody2D skeletonRigidbody = skeleton.GetComponent<Rigidbody2D>();
+        skeletonRigidbody.AddForce(direction * throwForce, ForceMode2D.Impulse);
     }
 }

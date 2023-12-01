@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class BossAI : EnemyAI
 {
+    public int maxHealth;
+
     protected override void Start()
     {
         base.Start();
 
         health = 100;
+
+        maxHealth = health;
     }
 
     protected override void Update()

@@ -200,7 +200,10 @@ MonoBehaviour:
   lastAttackTime: 0
   health: 50
   playerController: {fileID: 0}
+  maxHealth: 0
   skeletonPrefab: {fileID: 1199600018106073327, guid: 1e2b7c056c1af0847a13bd47cb134076, type: 3}
-  currentState: 0
-  currentAttackType: 0
-  throwForce: 10
+  boundary: {fileID: 512015272861873862, guid: 87282bae7cb8ef34ab856d59ce862784, type: 3}
+  meleeSpeedBuff: 1.2
+  lowHealthSpeedBuff: 1.75
+  attackRange: 10
+  meleeRange: 5
