@@ -12,7 +12,7 @@ public class SkeletonAI : EnemyAI
     }
     public SkeletonState skeletonState = SkeletonState.Walking;
     private int deathCount = 0;
-    public float reviveTime = 0.5f;
+    public float reviveTime = 250f; // In terms of hertz
     private float reviveTimer = 0f;
     private int maxHealth;
     private int pileOfBonesHealth;
@@ -117,7 +117,7 @@ public class SkeletonAI : EnemyAI
 
     void ChasePlayer()
     {
-        if (target != null)
+        if (target != null && target.CompareTag("Player"))
         {
             Vector2 directionToPlayer = target.position - transform.position;
             MoveTowardsTarget(directionToPlayer);
@@ -127,7 +127,7 @@ public class SkeletonAI : EnemyAI
     bool CanSeePlayer()
     {
         // Raycast to check if there's a clear line of sight to the player
-        if (target != null)
+        if (target != null && target.CompareTag("Player"))
         {
             Vector2 directionToPlayer = target.position - transform.position;
             RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, Mathf.Infinity, LayerMask.GetMask("Player"));
