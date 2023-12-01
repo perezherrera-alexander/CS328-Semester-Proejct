@@ -22,7 +22,12 @@ public class BossAI : EnemyAI
 
     protected override void FixedUpdate()
     {
-        base.FixedUpdate();
+
+        if (target != null)
+        {
+            //RotateToTarget();
+            AttackCooldown();
+        }
     }
 
     protected override void OnCollisionEnter2D(Collision2D other)
@@ -35,5 +40,27 @@ public class BossAI : EnemyAI
         {
             playerController.TakeDamage(3);
         }
+    }
+
+    protected bool CanSeePlayer()
+    {
+        // Raycast to check if there's a clear line of sight to the player
+        if (target != null)
+        {
+            Vector2 directionToPlayer = target.position - transform.position;
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, Mathf.Infinity, LayerMask.GetMask("Player"));
+
+            if (hit.collider != null && hit.collider.CompareTag("Wall"))
+            {
+                return false;
+            } else if (hit.collider != null && hit.collider.CompareTag("Player"))
+            {
+                // Player is in line of sight
+                return true;
+            }
+        }
+
+        // Player is not in line of sight
+        return false;
     }
 }

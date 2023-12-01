@@ -19,7 +19,15 @@ public class SkeletonKingAI : BossAI
     public float meleeRange = 5f; // Range for switching to melee mode
     private float originalSpeed; // Store the original speed for later use
 
-    private bool isMeleeMode = false;
+    //private bool isMeleeMode = false;
+
+    public enum BossState
+    {
+        Ranged,
+        Melee
+    }
+
+    public BossState bossState;
 
     protected override void Start()
     {
@@ -34,44 +42,40 @@ public class SkeletonKingAI : BossAI
     protected override void Update()
     {
         base.Update();
+        switch(bossState)
+        {
+            case BossState.Ranged:
+                if(CanSeePlayer())
+                {
+                    RangedMode();
+                    if(Vector2.Distance(transform.position, target.position) < meleeRange)
+                    {
+                        bossState = BossState.Melee;
+                    }
+                }
+                rangedAttackTimer -= Time.deltaTime;
+                break;
+            case BossState.Melee:
+                if(CanSeePlayer())
+                {
+                    MeleeMode();
+                    RangedMode();
+                    if(Vector2.Distance(transform.position, target.position) > meleeRange)
+                    {
+                        bossState = BossState.Ranged;
+                        rb.velocity = Vector2.zero;
+                    }
+                }
+                rangedAttackTimer -= Time.deltaTime;
+                break;
+        }
     }
 
     protected override void FixedUpdate()
     {
-        if (rangedAttackTimer > 0f)
-        {
-            rangedAttackTimer -= Time.deltaTime;
-        }
-
-        if (/*IsPlayerInBox() &&*/ health > 0)
-        {
-            if (health <= maxHealth * 0.15f) // If the Skeleton King is below 15% health
-            {
-                speed = originalSpeed * lowHealthSpeedBuff;
-            }
-
-            if (Vector2.Distance(transform.position, target.position) < meleeRange)
-            {
-                isMeleeMode = true;
-                speed = originalSpeed * meleeSpeedBuff; 
-            }
-            else
-            {
-                isMeleeMode = false;
-                speed = originalSpeed;
-            }
-
-            if (isMeleeMode || health <= maxHealth * 0.5f)
-            {
-                MeleeMode();
-            }
-            else
-            {
-                RangedMode();
-            }
-        }
+        base.FixedUpdate();
     }
-
+/*
     private bool IsPlayerInBox()
     {
         // Check if the player is within the specified box
@@ -85,12 +89,13 @@ public class SkeletonKingAI : BossAI
                Mathf.Abs(transform.position.x - target.position.x) < boxSize * 0.5f &&
                Mathf.Abs(transform.position.y - target.position.y) < boxSize * 0.5f;
     }
+    */
 
     private void RangedMode()
     {
         // Mirror the player's movements
-        Vector2 mirroredDirection = -(target.position - transform.position).normalized;
-        MoveTowardsTarget(mirroredDirection);
+        //Vector2 mirroredDirection = -(target.position - transform.position).normalized;
+        //MoveTowardsTarget(mirroredDirection);
 
         // Check for ranged attack conditions and throw a skeleton if necessary
         if (rangedAttackTimer <= 0f)
@@ -110,6 +115,7 @@ public class SkeletonKingAI : BossAI
         MoveTowardsTarget(target.position - transform.position);
     }
 
+    /*
     private void CheckForCornered()
     {
         Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, new Vector2(2f, 2f), 0f);
@@ -122,6 +128,7 @@ public class SkeletonKingAI : BossAI
             }
         }
     }
+    */
 
     private void ThrowSkeleton()
     {
