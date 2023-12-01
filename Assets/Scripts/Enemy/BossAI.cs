@@ -45,7 +45,7 @@ public class BossAI : EnemyAI
     protected bool CanSeePlayer()
     {
         // Raycast to check if there's a clear line of sight to the player
-        if (target != null)
+        if (target != null && target.CompareTag("Player"))
         {
             if (Vector2.Distance(transform.position, target.position) > 30)
             {
