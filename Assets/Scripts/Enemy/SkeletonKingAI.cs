@@ -5,7 +5,6 @@ using UnityEngine;
 public class SkeletonKingAI : BossAI
 {
     [SerializeField] private GameObject skeletonPrefab; // Skeleton prefab to be thrown
-    [SerializeField] private GameObject boundary; // Reference to the boundary GameObject
 
     private List<GameObject> skeletons; // List of skeletons thrown by the Skeleton King
     private GameObject parentObject; // Parent GameObject for the skeletons
