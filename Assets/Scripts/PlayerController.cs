@@ -35,8 +35,9 @@ public class Movement : MonoBehaviour
     public float randomAngleRange = 5f;
     public float randomSpeedRange = 2f;
     public int bulletDamage = 2;
-
+    #pragma warning disable 0414
     bool isPaused;
+    #pragma warning restore 0414
 
     private int dashCountdown = 0;
     private int dashCooldown = 0;
@@ -72,21 +73,10 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(isPaused) {
-            // This is just here to get rid of the warning
+        if(!isAlive){
+            // set tag to something that can't be hit
+            gameObject.tag = "Untagged";
         }
-
-        /*
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            TakeDamage(1);
-        }
-
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            UseMana(1);
-        }
-        */
 
         if(weaponType == WeaponType.Basic) {
             shootingCooldown = 0.05f;
