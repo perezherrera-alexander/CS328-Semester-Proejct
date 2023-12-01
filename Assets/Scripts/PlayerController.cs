@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class Movement : MonoBehaviour
 {
-    private bool isAlive = true;
+    public bool isAlive = true;
     public float movementSpeed;
     public float dashSpeed = 200f;
     public int dashDuration = 5; // In frames (0.2s) (1s)
