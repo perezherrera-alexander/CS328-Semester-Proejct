@@ -193,13 +193,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1626af44bdb65f34a90052f4ff601519, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 9047607505490038679, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
+  target: {fileID: 0}
   speed: 5
   rotateSpeed: 0.05
   attackCooldown: 1
   lastAttackTime: 0
   health: 50
-  playerController: {fileID: 178753887384531097, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
+  playerController: {fileID: 0}
   maxHealth: 0
   skeletonPrefab: {fileID: 1199600018106073327, guid: 1e2b7c056c1af0847a13bd47cb134076, type: 3}
   throwForce: 100

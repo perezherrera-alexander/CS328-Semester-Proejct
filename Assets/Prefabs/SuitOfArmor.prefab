@@ -193,13 +193,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24e39f0771459fe4dba467c4a1ac6ee4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 9047607505490038679, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
+  target: {fileID: 0}
   speed: 2
   rotateSpeed: 0.05
   attackCooldown: 1
   lastAttackTime: 0
   health: 10
-  playerController: {fileID: 178753887384531097, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
+  playerController: {fileID: 0}
   armorState: 0
   hardenTime: 4
   walkTime: 5.5

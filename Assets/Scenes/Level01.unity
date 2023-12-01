@@ -2683,17 +2683,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1e2b7c056c1af0847a13bd47cb134076, type: 3}
---- !u!114 &1959289146 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 178753887384531097, guid: 4c022e93d7f3ac14996c450b5c5b1c3d, type: 3}
-  m_PrefabInstance: {fileID: 1645229886}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8e92dc7968a86104caa46b33d8b5c87a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1978081328
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3196,13 +3185,17 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 958302283991530146, guid: 28b5442dd6353f647bb68f279bb361be, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 958302283991530146, guid: 28b5442dd6353f647bb68f279bb361be, type: 3}
       propertyPath: meleeRange
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 958302283991530146, guid: 28b5442dd6353f647bb68f279bb361be, type: 3}
       propertyPath: playerController
       value: 
-      objectReference: {fileID: 1959289146}
+      objectReference: {fileID: 0}
     - target: {fileID: 1589427583625990997, guid: 28b5442dd6353f647bb68f279bb361be, type: 3}
       propertyPath: m_Name
       value: Skeleton King
