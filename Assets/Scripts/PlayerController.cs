@@ -224,6 +224,8 @@ public class Movement : MonoBehaviour
         }
         else
         {
+            AudioSource audio = GetComponent<AudioSource>();
+            audio.Play();
             GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
             Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
         
