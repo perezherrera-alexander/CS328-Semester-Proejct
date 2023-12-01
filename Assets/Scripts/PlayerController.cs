@@ -4,9 +4,11 @@ using System.Data.Common;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 public class Movement : MonoBehaviour
 {
+    private bool isAlive = true;
     public float movementSpeed;
     public float dashSpeed = 200f;
     public int dashDuration = 5; // In frames (0.2s) (1s)
@@ -44,6 +46,10 @@ public class Movement : MonoBehaviour
 
     public AudioClip shootSound;
     public AudioClip dashSound;
+    public AudioClip playerDeathSound;
+
+    public ParticleSystem explosionEffect;
+    public Renderer playerRenderer;
 
     // Start is called before the first frame update
     void Start()
@@ -96,36 +102,38 @@ public class Movement : MonoBehaviour
     // Called once per 0.2 seconds
     void FixedUpdate()
     {
-        float inputX = Input.GetAxis("Horizontal");
-        float inputY = Input.GetAxis("Vertical");
-        Vector2 movement = new Vector2(inputX * movementSpeed, inputY * movementSpeed); // Movement vector
-
-        rb.MovePosition(rb.position + movement); // Move the player
-
-        // Get the player to look at the mouse
-        Vector2 aimDirection = GetDirectionToMouse(); // Saving this for later so that we don't compute it twice (in LookAtMouse() and in HandleDash())
-        
-        LookAtMouse(aimDirection);
-        HandleShooting(aimDirection);
-
-        // Dash Cooldown Handling
-        if(dashing) {
-            dashCountdown--;
-        }
-        if(dashCooldown > 0) {
-            dashCooldown--;
-        }
-        HandleDash(aimDirection);
-
-        if (currentMana >= maxMana)
-        {
-            currentMana = maxMana;
-        }
-        else 
-        {
-            currentMana += manaRegenRate;
-
-            manaBar.SetMana(currentMana);
+        if(isAlive){
+            float inputX = Input.GetAxis("Horizontal");
+            float inputY = Input.GetAxis("Vertical");
+            Vector2 movement = new Vector2(inputX * movementSpeed, inputY * movementSpeed); // Movement vector
+    
+            rb.MovePosition(rb.position + movement); // Move the player
+    
+            // Get the player to look at the mouse
+            Vector2 aimDirection = GetDirectionToMouse(); // Saving this for later so that we don't compute it twice (in LookAtMouse() and in HandleDash())
+            
+            LookAtMouse(aimDirection);
+            HandleShooting(aimDirection);
+    
+            // Dash Cooldown Handling
+            if(dashing) {
+                dashCountdown--;
+            }
+            if(dashCooldown > 0) {
+                dashCooldown--;
+            }
+            HandleDash(aimDirection);
+    
+            if (currentMana >= maxMana)
+            {
+                currentMana = maxMana;
+            }
+            else 
+            {
+                currentMana += manaRegenRate;
+    
+                manaBar.SetMana(currentMana);
+            }
         }
     }
 
@@ -146,6 +154,7 @@ public class Movement : MonoBehaviour
     }
 
     void HandleShooting(UnityEngine.Vector2 mouseDirection) {
+        if (!isAlive) return;
         if (Input.GetMouseButton(0) && Time.time > nextShotTime)  // Left mouse button
         {
             if(weaponType == WeaponType.Basic) {
@@ -260,13 +269,74 @@ public class Movement : MonoBehaviour
     }
 
     public void TakeDamage(int damage) {
-        if (currentHealth - damage <= 0) {
+        if (!isAlive) return;
+        currentHealth -= damage;
+    
+        if (currentHealth <= 0) {
             currentHealth = 0;
-        } else {
-            currentHealth -= damage;
-        }
+            isAlive = false;
+            
+            // Play the death sound
+            AudioSource.PlayClipAtPoint(playerDeathSound, transform.position);
+    
+            // Play explosion effect and change color to red
+            CreateExplosionEffect();
+            Renderer renderer = GetComponent<Renderer>();
+            if (renderer != null) {
+                renderer.enabled = false;
+            }
+    
+            // Disable colliders
+            Collider collider = GetComponent<Collider>();
+            if (collider != null) {
+                collider.enabled = false;
+            }
 
+            // Disable the Rigidbody to stop all physics interactions
+            Rigidbody rb = GetComponent<Rigidbody>();
+            if (rb != null) {
+                rb.isKinematic = true; // Stops the Rigidbody from reacting to physics
+                rb.velocity = Vector3.zero; // Optionally, immediately stop any movement
+            }
+
+            // Start the coroutine to wait and then reload the scene
+            StartCoroutine(ReloadSceneAfterDelay());
+        }
+    
         healthBar.SetHealth(currentHealth);
+    }
+
+    private void CreateExplosionEffect() {
+        GameObject explosionEffect = new GameObject("ExplosionEffect");
+        ParticleSystem particleSystem = explosionEffect.AddComponent<ParticleSystem>();
+    
+        // Set the position of the explosion to the player's position
+        explosionEffect.transform.position = transform.position;
+    
+        var main = particleSystem.main;
+        main.startSize = new ParticleSystem.MinMaxCurve(0.10f, 0.3f);
+        main.startSpeed = new ParticleSystem.MinMaxCurve(3f, 6f);
+        main.startLifetime = 0.2f;
+
+        var emission = particleSystem.emission;
+        emission.rateOverTime = 200;
+
+    
+        // Create a simple red material for the particles
+        Material redMaterial = new Material(Shader.Find("Particles/Standard Unlit"));
+        redMaterial.color = Color.red;
+        particleSystem.GetComponent<ParticleSystemRenderer>().material = redMaterial;
+
+        particleSystem.Play();
+    }
+
+
+    private IEnumerator ReloadSceneAfterDelay() {
+        // Wait for 1 second
+        yield return new WaitForSeconds(2);
+    
+        // Reload the scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void UseMana(int mana) {
@@ -280,6 +350,7 @@ public class Movement : MonoBehaviour
     }
 
     public void HandleDash(UnityEngine.Vector2 direction) { // Dash in the direction of the mouse
+        if (!isAlive) return;
         dashBar.SetDash(dashCooldown);
         if(dashCountdown <= 0) {
             dashing = false;

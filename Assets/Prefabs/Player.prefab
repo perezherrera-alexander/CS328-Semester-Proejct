@@ -126,6 +126,9 @@ MonoBehaviour:
   bulletDamage: 2
   shootSound: {fileID: 8300000, guid: 833361d863e8c9a4398ce071a6236f4b, type: 3}
   dashSound: {fileID: 8300000, guid: 0691701fc9fe47849942eebe7ba1773f, type: 3}
+  playerDeathSound: {fileID: 8300000, guid: cf90627b892a64e47986733f3107a485, type: 3}
+  explosionEffect: {fileID: 0}
+  playerRenderer: {fileID: 0}
 --- !u!114 &8168541574964438627
 MonoBehaviour:
   m_ObjectHideFlags: 0
