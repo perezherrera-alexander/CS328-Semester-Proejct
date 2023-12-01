@@ -13,11 +13,15 @@ public class PlayerSpells : MonoBehaviour {
 
     bool canBeTargeted = true;
 
+    private SpriteRenderer spriteRenderer; // Reference to the SpriteRenderer component
+
+
     void Start() {
         if(canBeTargeted) // This is just here to get rid of the warning
 
         manaBar = GetComponent<ManaBar>();
         movement = GetComponent<Movement>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update() {
@@ -25,7 +29,6 @@ public class PlayerSpells : MonoBehaviour {
             Invisibility();
             movement.UseMana(1);
             castDelayInvis = 15f;
-            canBeTargeted = false;
         } else if (Input.GetKeyDown(KeyCode.E) && movement.currentMana > 0 && castDelayHaste <= 0) {
             Haste();
             movement.UseMana(1);
@@ -35,17 +38,19 @@ public class PlayerSpells : MonoBehaviour {
             castDelayHaste -= Time.deltaTime;
         }
     }
-
+    
     void Invisibility() {
         // Make the player invisible for a short time
-
         StartCoroutine(InvisibilityTimer());
+        spriteRenderer.color = new Color(1f, 1f, 1f, 0.10f);
+
     }
 
     IEnumerator InvisibilityTimer() {
-
+        canBeTargeted = false;
         yield return new WaitForSeconds(5);
         canBeTargeted = true;
+        spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
     }
 
     void Haste() {
