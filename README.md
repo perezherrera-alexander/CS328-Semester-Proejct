@@ -2,6 +2,22 @@
 
 Unity Version: 2022.3.9f1 (LTS)
 
+### Version 0.3.0 (12/1/2023)
+- Added 3 new enemies
+    - Skeleton
+    - Goblin
+    - Reanimated Suit of Armor
+- Added Skeleton King boss to level 1
+- Compelted level 1 design & logic
+- Fully implemented mana mechanic
+    - Mana is now used when casting spells
+    - Mana regenerates over time
+    - Killing enemies restores mana
+- Added spells/powerups (Press Q or E)
+- Added art for enemies
+- Added music to menu and level 1
+- Added sounds effects for shooting, dashing, and death
+
 ### Version 0.2.3 (11/9/2023)
 - Redid dash mechanic
     - Now features a cooldown
