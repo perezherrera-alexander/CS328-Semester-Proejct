@@ -47,6 +47,10 @@ public class BossAI : EnemyAI
         // Raycast to check if there's a clear line of sight to the player
         if (target != null)
         {
+            if (Vector2.Distance(transform.position, target.position) > 30)
+            {
+                return false;
+            }
             Vector2 directionToPlayer = target.position - transform.position;
             RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, Mathf.Infinity, LayerMask.GetMask("Player"));
 
