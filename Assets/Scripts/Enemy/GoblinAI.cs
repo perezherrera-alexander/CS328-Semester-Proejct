@@ -7,7 +7,6 @@ public class GoblinAI : EnemyAI
     private bool isInPack = false;
     private bool isAttacking = false;
     private float goblinCheckRadius = 15f; // Adjust as needed
-    private bool isRandomMovementScheduled = false;
     private bool isCloseToGoblin = false;
 
     protected override void Start()
@@ -154,5 +153,13 @@ public class GoblinAI : EnemyAI
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
         Quaternion q = Quaternion.Euler(new Vector3(0, 0, angle));
         transform.localRotation = Quaternion.Slerp(transform.localRotation, q, rotateSpeed);
+    }
+
+    protected override void Die()
+    {
+        base.Die(); 
+
+        // Give player back mana
+        playerController.currentMana += 15;
     }
 }

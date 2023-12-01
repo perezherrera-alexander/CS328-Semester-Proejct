@@ -15,6 +15,8 @@ public class EnemyAI : MonoBehaviour {
 
     public Movement playerController;
 
+    public AudioClip enemyDeathSound;
+
     protected virtual void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -87,6 +89,7 @@ public class EnemyAI : MonoBehaviour {
 
     protected virtual void Die()
     {
+        AudioSource.PlayClipAtPoint(enemyDeathSound, transform.position);
         Destroy(gameObject);
     }
 

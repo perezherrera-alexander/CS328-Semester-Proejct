@@ -77,8 +77,8 @@ SpriteRenderer:
   m_SortingLayerID: 755275367
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 540c1bfd9508fbb46a8f16666656b204, type: 3}
-  m_Color: {r: 0.6681648, g: 0.990566, b: 0.784161, a: 1}
+  m_Sprite: {fileID: 21300000, guid: c0b1241a4026bd14e8d8640c842dc072, type: 3}
+  m_Color: {r: 0.13370028, g: 0.8679245, b: 0.10971874, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -190,3 +190,4 @@ MonoBehaviour:
   lastAttackTime: 0
   health: 3
   playerController: {fileID: 0}
+  enemyDeathSound: {fileID: 8300000, guid: 3ce4cfdfd955494428f73fb4784bc9cb, type: 3}

@@ -483,6 +483,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pauseMenuUI: {fileID: 3070929694948402309}
+  audioManager: {fileID: 0}
 --- !u!1 &3581343896481188551
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class SkeletonAI : EnemyAI
 {
-
     public enum SkeletonState
     {
         Walking,
@@ -13,17 +12,22 @@ public class SkeletonAI : EnemyAI
     }
     public SkeletonState skeletonState = SkeletonState.Walking;
     private int deathCount = 0;
-    public float reviveTime = 5f;
+    public float reviveTime = 2f; // In terms of hertz
     private float reviveTimer = 0f;
     private int maxHealth;
     private int pileOfBonesHealth;
+    private SpriteRenderer spriteRenderer;
+
+    public Sprite walkingSprite;
+    public Sprite pileOfBonesSprite;
 
     protected override void Start()
     {
         base.Start();
 
         maxHealth = health;
-        pileOfBonesHealth = maxHealth / 2;
+        pileOfBonesHealth = 3 * maxHealth / 4;
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     protected override void Update()
@@ -31,18 +35,21 @@ public class SkeletonAI : EnemyAI
         base.Update();
         switch(skeletonState){
             case SkeletonState.Walking:
+                spriteRenderer.sprite = walkingSprite;
                 if (CanSeePlayer())
                 {
                     ChasePlayer();
                 }
                 break;
             case SkeletonState.Dropping:
+                spriteRenderer.sprite = pileOfBonesSprite;
                 rb.velocity = Vector2.zero;
                 reviveTimer = 0;
                 skeletonState = SkeletonState.PileOfBones;
                 rb.freezeRotation = true;
                 break;
             case SkeletonState.PileOfBones:
+                spriteRenderer.sprite = pileOfBonesSprite;
                 rb.velocity = Vector2.zero;
                 reviveTimer += Time.deltaTime;
                 if(reviveTimer >= reviveTime){
@@ -95,7 +102,10 @@ public class SkeletonAI : EnemyAI
             if (deathCount >= 2)
             {
                 //Debug.Log("Died for real");
-                Destroy(gameObject);
+                base.Die();
+
+                // Give player back mana
+                playerController.currentMana += 10;
             }
             else
             {
@@ -107,7 +117,7 @@ public class SkeletonAI : EnemyAI
 
     void ChasePlayer()
     {
-        if (target != null)
+        if (target != null && target.CompareTag("Player"))
         {
             Vector2 directionToPlayer = target.position - transform.position;
             MoveTowardsTarget(directionToPlayer);
@@ -117,7 +127,7 @@ public class SkeletonAI : EnemyAI
     bool CanSeePlayer()
     {
         // Raycast to check if there's a clear line of sight to the player
-        if (target != null)
+        if (target != null && target.CompareTag("Player"))
         {
             Vector2 directionToPlayer = target.position - transform.position;
             RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, Mathf.Infinity, LayerMask.GetMask("Player"));

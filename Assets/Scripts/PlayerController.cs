@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 public class Movement : MonoBehaviour
 {
+    public bool isAlive = true;
     public float movementSpeed;
     public float dashSpeed = 200f;
     public int dashDuration = 5; // In frames (0.2s) (1s)
@@ -13,13 +16,16 @@ public class Movement : MonoBehaviour
     public DashBar dashBar;
     private Rigidbody2D rb;
 
-    public int maxHealth = 10;
+    public int maxHealth = 20;
     public int currentHealth;
     public HealthBar healthBar;
 
-    public int maxMana = 10;
-    public int currentMana;
+    public float maxMana = 100;
+    public float currentMana;
     public ManaBar manaBar;
+    public float manaRegenRate = 0.02f;
+    public float manaEmptyCooldown = 250f;
+    public float manaCooldownTimer = 0;
 
     public GameObject bulletPrefab;
     public WeaponType weaponType;
@@ -28,6 +34,7 @@ public class Movement : MonoBehaviour
     private float nextShotTime = 0f;
     public float randomAngleRange = 5f;
     public float randomSpeedRange = 2f;
+    public int bulletDamage = 2;
 
     bool isPaused;
 
@@ -36,6 +43,13 @@ public class Movement : MonoBehaviour
     private bool dashing = false;
 
     private float maxBeamLength = 100f;
+
+    public AudioClip shootSound;
+    public AudioClip dashSound;
+    public AudioClip playerDeathSound;
+
+    public ParticleSystem explosionEffect;
+    public Renderer playerRenderer;
 
     // Start is called before the first frame update
     void Start()
@@ -62,6 +76,7 @@ public class Movement : MonoBehaviour
             // This is just here to get rid of the warning
         }
 
+        /*
         if (Input.GetKeyDown(KeyCode.J))
         {
             TakeDamage(1);
@@ -71,6 +86,7 @@ public class Movement : MonoBehaviour
         {
             UseMana(1);
         }
+        */
 
         if(weaponType == WeaponType.Basic) {
             shootingCooldown = 0.05f;
@@ -86,26 +102,39 @@ public class Movement : MonoBehaviour
     // Called once per 0.2 seconds
     void FixedUpdate()
     {
-        float inputX = Input.GetAxis("Horizontal");
-        float inputY = Input.GetAxis("Vertical");
-        Vector2 movement = new Vector2(inputX * movementSpeed, inputY * movementSpeed); // Movement vector
-
-        rb.MovePosition(rb.position + movement); // Move the player
-
-        // Get the player to look at the mouse
-        Vector2 aimDirection = GetDirectionToMouse(); // Saving this for later so that we don't compute it twice (in LookAtMouse() and in HandleDash())
-        
-        LookAtMouse(aimDirection);
-        HandleShooting(aimDirection);
-
-        // Dash Cooldown Handling
-        if(dashing) {
-            dashCountdown--;
+        if(isAlive){
+            float inputX = Input.GetAxis("Horizontal");
+            float inputY = Input.GetAxis("Vertical");
+            Vector2 movement = new Vector2(inputX * movementSpeed, inputY * movementSpeed); // Movement vector
+    
+            rb.MovePosition(rb.position + movement); // Move the player
+    
+            // Get the player to look at the mouse
+            Vector2 aimDirection = GetDirectionToMouse(); // Saving this for later so that we don't compute it twice (in LookAtMouse() and in HandleDash())
+            
+            LookAtMouse(aimDirection);
+            HandleShooting(aimDirection);
+    
+            // Dash Cooldown Handling
+            if(dashing) {
+                dashCountdown--;
+            }
+            if(dashCooldown > 0) {
+                dashCooldown--;
+            }
+            HandleDash(aimDirection);
+    
+            if (currentMana >= maxMana)
+            {
+                currentMana = maxMana;
+            }
+            else 
+            {
+                currentMana += manaRegenRate;
+    
+                manaBar.SetMana(currentMana);
+            }
         }
-        if(dashCooldown > 0) {
-            dashCooldown--;
-        }
-        HandleDash(aimDirection);
     }
 
     Vector2 GetMousePosition() { // Returns the mouse position in world coordinates
@@ -125,6 +154,7 @@ public class Movement : MonoBehaviour
     }
 
     void HandleShooting(UnityEngine.Vector2 mouseDirection) {
+        if (!isAlive) return;
         if (Input.GetMouseButton(0) && Time.time > nextShotTime)  // Left mouse button
         {
             if(weaponType == WeaponType.Basic) {
@@ -199,26 +229,114 @@ public class Movement : MonoBehaviour
         // No need to destroy the beam, we'll reuse it as long as the player is holding down click. We'll destroy it later on if the player stop's clicking
     }
 
-    void Shoot() {
-        GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-    
-        float randomAngle = Random.Range(-randomAngleRange, randomAngleRange);  // Get random angle deviation
-        float adjustedBulletSpeed = bulletSpeed + Random.Range(-randomSpeedRange, randomSpeedRange);  // Get random speed deviation 
+    public void Shoot() {
+        if (currentMana - bulletDamage <= 0) {
+            currentMana = 0;
+            return;
+        }
+        else
+        {
+            // Play shooting sound
+            AudioSource.PlayClipAtPoint(shootSound, transform.position);
+            GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+            Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+        
+            float randomAngle = Random.Range(-randomAngleRange, randomAngleRange);  // Get random angle deviation
+            float adjustedBulletSpeed = bulletSpeed + Random.Range(-randomSpeedRange, randomSpeedRange);  // Get random speed deviation 
 
-        Vector2 shootDirection = Quaternion.Euler(0, 0, randomAngle) * transform.up;  // Apply random angle deviation
+            Vector2 shootDirection = Quaternion.Euler(0, 0, randomAngle) * transform.up;  // Apply random angle deviation
 
-        bulletRb.AddForce(shootDirection * adjustedBulletSpeed, ForceMode2D.Impulse);
+            bulletRb.AddForce(shootDirection * adjustedBulletSpeed, ForceMode2D.Impulse);
+
+            /* For mana cooldown, not currently working
+            if (currentMana == 0 && Input.GetMouseButton(0) && manaCooldownTimer < manaEmptyCooldown)
+            {
+                manaCooldownTimer += Time.deltaTime;
+            }
+            else if (currentMana == 0 && Input.GetMouseButton(0) && manaCooldownTimer >= manaEmptyCooldown)
+            {
+                UseMana(bulletDamage);
+
+                manaCooldownTimer = 0;
+            } 
+            else if (currentMana > 0)
+            {
+                UseMana(bulletDamage);
+            }
+            */
+            UseMana(bulletDamage);
+        }
     }
 
     public void TakeDamage(int damage) {
-        if (currentHealth - damage <= 0) {
+        if (!isAlive) return;
+        currentHealth -= damage;
+    
+        if (currentHealth <= 0) {
             currentHealth = 0;
-        } else {
-            currentHealth -= damage;
-        }
+            isAlive = false;
+            
+            // Play the death sound
+            AudioSource.PlayClipAtPoint(playerDeathSound, transform.position);
+    
+            // Play explosion effect and change color to red
+            CreateExplosionEffect();
+            Renderer renderer = GetComponent<Renderer>();
+            if (renderer != null) {
+                renderer.enabled = false;
+            }
+    
+            // Disable colliders
+            Collider collider = GetComponent<Collider>();
+            if (collider != null) {
+                collider.enabled = false;
+            }
 
+            // Disable the Rigidbody to stop all physics interactions
+            Rigidbody rb = GetComponent<Rigidbody>();
+            if (rb != null) {
+                rb.isKinematic = true; // Stops the Rigidbody from reacting to physics
+                rb.velocity = Vector3.zero; // Optionally, immediately stop any movement
+            }
+
+            // Start the coroutine to wait and then reload the scene
+            StartCoroutine(ReloadSceneAfterDelay());
+        }
+    
         healthBar.SetHealth(currentHealth);
+    }
+
+    private void CreateExplosionEffect() {
+        GameObject explosionEffect = new GameObject("ExplosionEffect");
+        ParticleSystem particleSystem = explosionEffect.AddComponent<ParticleSystem>();
+    
+        // Set the position of the explosion to the player's position
+        explosionEffect.transform.position = transform.position;
+    
+        var main = particleSystem.main;
+        main.startSize = new ParticleSystem.MinMaxCurve(0.10f, 0.3f);
+        main.startSpeed = new ParticleSystem.MinMaxCurve(3f, 6f);
+        main.startLifetime = 0.2f;
+
+        var emission = particleSystem.emission;
+        emission.rateOverTime = 200;
+
+    
+        // Create a simple red material for the particles
+        Material redMaterial = new Material(Shader.Find("Particles/Standard Unlit"));
+        redMaterial.color = Color.red;
+        particleSystem.GetComponent<ParticleSystemRenderer>().material = redMaterial;
+
+        particleSystem.Play();
+    }
+
+
+    private IEnumerator ReloadSceneAfterDelay() {
+        // Wait for 1 second
+        yield return new WaitForSeconds(2);
+    
+        // Reload the scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void UseMana(int mana) {
@@ -232,6 +350,7 @@ public class Movement : MonoBehaviour
     }
 
     public void HandleDash(UnityEngine.Vector2 direction) { // Dash in the direction of the mouse
+        if (!isAlive) return;
         dashBar.SetDash(dashCooldown);
         if(dashCountdown <= 0) {
             dashing = false;
@@ -243,6 +362,8 @@ public class Movement : MonoBehaviour
             }
             else
             {
+                // Play dash sound
+                AudioSource.PlayClipAtPoint(dashSound, transform.position);
                 if(!dashing) {
                     dashCountdown = dashDuration;
                     dashCooldown = dashCooldownTimer;

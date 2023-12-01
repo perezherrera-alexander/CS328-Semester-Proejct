@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 755275367
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 8da367d8909b57345b45097faf09dcf5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9b7b1597b9ea06a4383717a998123df5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -111,15 +111,24 @@ MonoBehaviour:
   maxHealth: 10
   currentHealth: 0
   healthBar: {fileID: 0}
-  maxMana: 10
+  maxMana: 100
   currentMana: 0
   manaBar: {fileID: 0}
+  manaRegenRate: 0.1
+  manaEmptyCooldown: 250
+  manaCooldownTimer: 0
   bulletPrefab: {fileID: 8620902242178562404, guid: 4cf024747222bc64b878adcd935f8d48, type: 3}
   weaponType: 0
   bulletSpeed: 9
   shootingCooldown: 0.05
   randomAngleRange: 6
   randomSpeedRange: 1
+  bulletDamage: 2
+  shootSound: {fileID: 8300000, guid: 833361d863e8c9a4398ce071a6236f4b, type: 3}
+  dashSound: {fileID: 8300000, guid: 0691701fc9fe47849942eebe7ba1773f, type: 3}
+  playerDeathSound: {fileID: 8300000, guid: cf90627b892a64e47986733f3107a485, type: 3}
+  explosionEffect: {fileID: 0}
+  playerRenderer: {fileID: 0}
 --- !u!114 &8168541574964438627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,6 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0514cb21357f52459c4cff90880c1f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 0}
 --- !u!50 &5088870707598306816
 Rigidbody2D:
   serializedVersion: 4

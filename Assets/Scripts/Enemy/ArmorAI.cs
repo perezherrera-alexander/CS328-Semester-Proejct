@@ -83,11 +83,15 @@ public class ArmorAI : EnemyAI
                 TakeDamage();
             }
         }
+        else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown && armorState == ArmorState.Walking)
+        {
+            playerController.TakeDamage(4);
+        }
     }
 
     void ChasePlayer()
     {
-        if (target != null)
+        if (target != null && target.CompareTag("Player"))
         {
             Vector2 directionToPlayer = target.position - transform.position;
             MoveTowardsTarget(directionToPlayer);
@@ -97,7 +101,7 @@ public class ArmorAI : EnemyAI
     bool CanSeePlayer()
     {
         // Raycast to check if there's a clear line of sight to the player
-        if (target != null)
+        if (target != null && target.CompareTag("Player"))
         {
             Vector2 directionToPlayer = target.position - transform.position;
             RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, Mathf.Infinity, LayerMask.GetMask("Player"));
@@ -118,6 +122,9 @@ public class ArmorAI : EnemyAI
 
     protected override void Die()
     {
-        Destroy(gameObject);
+        base.Die();
+
+        // Give player back mana
+        playerController.currentMana += 30;
     }
 }

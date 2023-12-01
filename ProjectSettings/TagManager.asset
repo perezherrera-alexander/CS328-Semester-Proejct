@@ -8,6 +8,8 @@ TagManager:
   - Goblin
   - DamagingObject
   - Enemy
+  - Boss
+  - Invisible
   layers:
   - Default
   - TransparentFX
@@ -20,7 +22,7 @@ TagManager:
   - Bullet
   - Enemy
   - Goblin
-  - 
+  - BossBoundary
   - 
   - 
   - 

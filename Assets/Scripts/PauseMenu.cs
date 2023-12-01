@@ -5,6 +5,8 @@ public class PauseMenu : MonoBehaviour {
     public static bool GameIsPaused = false;
     public GameObject pauseMenuUI;
 
+    public AudioManager audioManager;
+
     // Update is called once per frame
     void Update() {
         if (Input.GetKeyDown(KeyCode.Escape)) {
@@ -41,5 +43,15 @@ public class PauseMenu : MonoBehaviour {
         Time.timeScale = 1f;
         GameIsPaused = false;
         SceneManager.LoadScene("MainMenu");
+    }
+
+    public void ToggleMusic()
+    {
+        audioManager.musicSource.mute = !audioManager.musicSource.mute;
+    }
+
+    public void MusicVolume(float volume)
+    {
+        audioManager.musicSource.volume = volume;
     }
 }

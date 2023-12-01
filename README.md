@@ -1,10 +1,8 @@
 # CS328-Semester-Project
 
 Unity Version: 2022.3.9f1 (LTS)
-### Version 0.2.4
-- Added Art for characters, and modified colors
 
-### Version 0.2.3
+### Version 0.2.3 (11/9/2023)
 - Redid dash mechanic
     - Now features a cooldown
     - Added a dash bar to the UI
