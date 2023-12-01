@@ -6161,6 +6161,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1422868947718280407, guid: adfe8e0719f779547b3ceba0f689da8d, type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0.09522961
+      objectReference: {fileID: 0}
+    - target: {fileID: 1422868947718280407, guid: adfe8e0719f779547b3ceba0f689da8d, type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0.13938208
+      objectReference: {fileID: 0}
+    - target: {fileID: 1422868947718280407, guid: adfe8e0719f779547b3ceba0f689da8d, type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0.18867922
+      objectReference: {fileID: 0}
     - target: {fileID: 5278599574324300165, guid: adfe8e0719f779547b3ceba0f689da8d, type: 3}
       propertyPath: m_Name
       value: PlayerCamera
