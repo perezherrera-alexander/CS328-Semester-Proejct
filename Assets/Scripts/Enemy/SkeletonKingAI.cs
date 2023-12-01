@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ public class SkeletonKingAI : BossAI
 
     private List<GameObject> skeletons; // List of skeletons thrown by the Skeleton King
     private GameObject parentObject; // Parent GameObject for the skeletons
-    private int throwForce = 100; // Force applied to the skeleton when thrown
+    public int throwForce = 100; // Force applied to the skeleton when thrown
 
     public float rangedAttackCooldown = 3f; // Cooldown between ranged attacks
     private float rangedAttackTimer = 3f; // Timer for ranged attacks
@@ -145,7 +146,17 @@ public class SkeletonKingAI : BossAI
         Rigidbody2D skeletonRigidbody = skeleton.GetComponent<Rigidbody2D>();
         Collider2D skeletonCollider = skeleton.GetComponent<Collider2D>();
         Physics2D.IgnoreCollision(skeletonCollider, GetComponent<Collider2D>());
-        skeletonRigidbody.AddForce(direction * throwForce, ForceMode2D.Impulse);
-        
+        // Start a coroutine to apply force to the skeleton for 2 seconds
+        StartCoroutine(AddForceToSkeleton(skeletonRigidbody, direction, skeletonCollider));
+    }
+
+    IEnumerator AddForceToSkeleton(Rigidbody2D skeletonRigidbody, Vector2 direction, Collider2D skeletonCollider)
+    {
+        for(int i = 0; i < 100; i++)
+        {
+            skeletonRigidbody.AddForce(direction * 500, ForceMode2D.Force);
+            yield return new WaitForSeconds(0.02f);
+        }
+        Physics2D.IgnoreCollision(skeletonCollider, GetComponent<Collider2D>(), false);
     }
 }
