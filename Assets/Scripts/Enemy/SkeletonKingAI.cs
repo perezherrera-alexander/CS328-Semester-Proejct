@@ -8,7 +8,7 @@ public class SkeletonKingAI : BossAI
 
     private List<GameObject> skeletons; // List of skeletons thrown by the Skeleton King
     private GameObject parentObject; // Parent GameObject for the skeletons
-    private int throwForce = 10; // Force applied to the skeleton when thrown
+    private int throwForce = 100; // Force applied to the skeleton when thrown
 
     public float rangedAttackCooldown = 3f; // Cooldown between ranged attacks
     private float rangedAttackTimer = 3f; // Timer for ranged attacks
@@ -133,7 +133,7 @@ public class SkeletonKingAI : BossAI
     private void ThrowSkeleton()
     {
         // Instantiate a new skeleton GameObject
-        GameObject skeleton = Instantiate(skeletonPrefab, transform.position, Quaternion.identity);
+        GameObject skeleton = Instantiate(skeletonPrefab, transform.position /*+ new Vector3 (2, 2, 0)*/, Quaternion.identity);
         parentObject.transform.position = transform.position;
         skeleton.transform.parent = parentObject.transform;
         skeletons.Add(skeleton);
@@ -143,6 +143,9 @@ public class SkeletonKingAI : BossAI
 
         // Apply force to the skeleton to throw it towards the player
         Rigidbody2D skeletonRigidbody = skeleton.GetComponent<Rigidbody2D>();
+        Collider2D skeletonCollider = skeleton.GetComponent<Collider2D>();
+        Physics2D.IgnoreCollision(skeletonCollider, GetComponent<Collider2D>());
         skeletonRigidbody.AddForce(direction * throwForce, ForceMode2D.Impulse);
+        
     }
 }

@@ -96,6 +96,9 @@ public class SkeletonAI : EnemyAI
             {
                 //Debug.Log("Died for real");
                 Destroy(gameObject);
+
+                // Give player back mana
+                playerController.currentMana += 5;
             }
             else
             {

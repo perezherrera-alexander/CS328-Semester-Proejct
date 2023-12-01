@@ -111,15 +111,17 @@ MonoBehaviour:
   maxHealth: 10
   currentHealth: 0
   healthBar: {fileID: 0}
-  maxMana: 10
+  maxMana: 100
   currentMana: 0
   manaBar: {fileID: 0}
+  manaRegenRate: 0.02
   bulletPrefab: {fileID: 8620902242178562404, guid: 4cf024747222bc64b878adcd935f8d48, type: 3}
   weaponType: 0
   bulletSpeed: 9
   shootingCooldown: 0.05
   randomAngleRange: 6
   randomSpeedRange: 1
+  bulletDamage: 2
 --- !u!114 &8168541574964438627
 MonoBehaviour:
   m_ObjectHideFlags: 0

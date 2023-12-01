@@ -154,4 +154,12 @@ public class GoblinAI : EnemyAI
         Quaternion q = Quaternion.Euler(new Vector3(0, 0, angle));
         transform.localRotation = Quaternion.Slerp(transform.localRotation, q, rotateSpeed);
     }
+
+    protected override void Die()
+    {
+        base.Die(); 
+
+        // Give player back mana
+        playerController.currentMana += 3;
+    }
 }

@@ -13,13 +13,14 @@ public class Movement : MonoBehaviour
     public DashBar dashBar;
     private Rigidbody2D rb;
 
-    public int maxHealth = 10;
+    public int maxHealth = 20;
     public int currentHealth;
     public HealthBar healthBar;
 
-    public int maxMana = 10;
-    public int currentMana;
+    public float maxMana = 100;
+    public float currentMana;
     public ManaBar manaBar;
+    public float manaRegenRate = 0.02f;
 
     public GameObject bulletPrefab;
     public WeaponType weaponType;
@@ -28,6 +29,7 @@ public class Movement : MonoBehaviour
     private float nextShotTime = 0f;
     public float randomAngleRange = 5f;
     public float randomSpeedRange = 2f;
+    public int bulletDamage = 2;
 
     bool isPaused;
 
@@ -62,6 +64,7 @@ public class Movement : MonoBehaviour
             // This is just here to get rid of the warning
         }
 
+        /*
         if (Input.GetKeyDown(KeyCode.J))
         {
             TakeDamage(1);
@@ -71,6 +74,7 @@ public class Movement : MonoBehaviour
         {
             UseMana(1);
         }
+        */
 
         if(weaponType == WeaponType.Basic) {
             shootingCooldown = 0.05f;
@@ -106,6 +110,17 @@ public class Movement : MonoBehaviour
             dashCooldown--;
         }
         HandleDash(aimDirection);
+
+        if (currentMana >= maxMana)
+        {
+            currentMana = maxMana;
+        }
+        else 
+        {
+            currentMana += manaRegenRate;
+
+            manaBar.SetMana(currentMana);
+        }
     }
 
     Vector2 GetMousePosition() { // Returns the mouse position in world coordinates
@@ -199,16 +214,25 @@ public class Movement : MonoBehaviour
         // No need to destroy the beam, we'll reuse it as long as the player is holding down click. We'll destroy it later on if the player stop's clicking
     }
 
-    void Shoot() {
-        GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-    
-        float randomAngle = Random.Range(-randomAngleRange, randomAngleRange);  // Get random angle deviation
-        float adjustedBulletSpeed = bulletSpeed + Random.Range(-randomSpeedRange, randomSpeedRange);  // Get random speed deviation 
+    public void Shoot() {
+        if (currentMana - bulletDamage <= 0) {
+            currentMana = 0;
+            return;
+        }
+        else
+        {
+            GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+            Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+        
+            float randomAngle = Random.Range(-randomAngleRange, randomAngleRange);  // Get random angle deviation
+            float adjustedBulletSpeed = bulletSpeed + Random.Range(-randomSpeedRange, randomSpeedRange);  // Get random speed deviation 
 
-        Vector2 shootDirection = Quaternion.Euler(0, 0, randomAngle) * transform.up;  // Apply random angle deviation
+            Vector2 shootDirection = Quaternion.Euler(0, 0, randomAngle) * transform.up;  // Apply random angle deviation
 
-        bulletRb.AddForce(shootDirection * adjustedBulletSpeed, ForceMode2D.Impulse);
+            bulletRb.AddForce(shootDirection * adjustedBulletSpeed, ForceMode2D.Impulse);
+
+            UseMana(bulletDamage);
+        }
     }
 
     public void TakeDamage(int damage) {

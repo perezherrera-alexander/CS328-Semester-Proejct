@@ -83,6 +83,10 @@ public class ArmorAI : EnemyAI
                 TakeDamage();
             }
         }
+        else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown && armorState == ArmorState.Walking)
+        {
+            playerController.TakeDamage(4);
+        }
     }
 
     void ChasePlayer()
@@ -118,6 +122,9 @@ public class ArmorAI : EnemyAI
 
     protected override void Die()
     {
-        Destroy(gameObject);
+        base.Die();
+
+        // Give player back mana
+        playerController.currentMana += 10;
     }
 }
