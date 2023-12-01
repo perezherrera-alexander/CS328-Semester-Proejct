@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -21,6 +22,8 @@ public class Movement : MonoBehaviour
     public float currentMana;
     public ManaBar manaBar;
     public float manaRegenRate = 0.02f;
+    public float manaEmptyCooldown = 250f;
+    public float manaCooldownTimer = 0;
 
     public GameObject bulletPrefab;
     public WeaponType weaponType;
@@ -231,6 +234,22 @@ public class Movement : MonoBehaviour
 
             bulletRb.AddForce(shootDirection * adjustedBulletSpeed, ForceMode2D.Impulse);
 
+            /* For mana cooldown, not currently working
+            if (currentMana == 0 && Input.GetMouseButton(0) && manaCooldownTimer < manaEmptyCooldown)
+            {
+                manaCooldownTimer += Time.deltaTime;
+            }
+            else if (currentMana == 0 && Input.GetMouseButton(0) && manaCooldownTimer >= manaEmptyCooldown)
+            {
+                UseMana(bulletDamage);
+
+                manaCooldownTimer = 0;
+            } 
+            else if (currentMana > 0)
+            {
+                UseMana(bulletDamage);
+            }
+            */
             UseMana(bulletDamage);
         }
     }

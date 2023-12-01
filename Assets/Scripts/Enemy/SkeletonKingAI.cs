@@ -151,9 +151,9 @@ public class SkeletonKingAI : BossAI
 
     IEnumerator AddForceToSkeleton(Rigidbody2D skeletonRigidbody, Vector2 direction, Collider2D skeletonCollider)
     {
-        for(int i = 0; i < 100; i++)
+        for(int i = 0; i < 25; i++)
         {
-            skeletonRigidbody.AddForce(direction * 500, ForceMode2D.Force);
+            skeletonRigidbody.AddForce(direction * 750, ForceMode2D.Force);
             yield return new WaitForSeconds(0.02f);
         }
         Physics2D.IgnoreCollision(skeletonCollider, GetComponent<Collider2D>(), false);
