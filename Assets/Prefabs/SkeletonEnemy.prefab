@@ -192,6 +192,6 @@ MonoBehaviour:
   playerController: {fileID: 0}
   enemyDeathSound: {fileID: 8300000, guid: 3ce4cfdfd955494428f73fb4784bc9cb, type: 3}
   skeletonState: 0
-  reviveTime: 0.5
+  reviveTime: 2
   walkingSprite: {fileID: 21300000, guid: 055916fd8258a0748bddd2ab2ca1a959, type: 3}
   pileOfBonesSprite: {fileID: 21300000, guid: 5bab58df5c6b37b4b87c63edab832664, type: 3}

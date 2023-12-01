@@ -12,7 +12,7 @@ public class SkeletonAI : EnemyAI
     }
     public SkeletonState skeletonState = SkeletonState.Walking;
     private int deathCount = 0;
-    public float reviveTime = 250f; // In terms of hertz
+    public float reviveTime = 2f; // In terms of hertz
     private float reviveTimer = 0f;
     private int maxHealth;
     private int pileOfBonesHealth;
