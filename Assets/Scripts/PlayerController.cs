@@ -42,6 +42,9 @@ public class Movement : MonoBehaviour
 
     private float maxBeamLength = 100f;
 
+    public AudioClip shootSound;
+    public AudioClip dashSound;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -224,8 +227,8 @@ public class Movement : MonoBehaviour
         }
         else
         {
-            AudioSource audio = GetComponent<AudioSource>();
-            audio.Play();
+            // Play shooting sound
+            AudioSource.PlayClipAtPoint(shootSound, transform.position);
             GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
             Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
         
@@ -288,6 +291,8 @@ public class Movement : MonoBehaviour
             }
             else
             {
+                // Play dash sound
+                AudioSource.PlayClipAtPoint(dashSound, transform.position);
                 if(!dashing) {
                     dashCountdown = dashDuration;
                     dashCooldown = dashCooldownTimer;
