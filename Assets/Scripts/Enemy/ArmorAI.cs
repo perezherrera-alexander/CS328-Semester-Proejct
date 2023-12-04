@@ -64,7 +64,13 @@ public class ArmorAI : EnemyAI
     {
         if(armorState == ArmorState.Walking)
         {
-            base.FixedUpdate();
+            rb.velocity = transform.up * speed;
+
+            if (target != null && target.CompareTag("Player"))
+            {
+                RotateToTarget();
+                AttackCooldown();
+            }
         }
     }
 

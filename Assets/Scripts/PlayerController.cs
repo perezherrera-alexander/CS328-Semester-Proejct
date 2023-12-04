@@ -35,6 +35,7 @@ public class Movement : MonoBehaviour
     public float randomAngleRange = 5f;
     public float randomSpeedRange = 2f;
     public int bulletDamage = 2;
+    public bool playerIsShooting = false;
     #pragma warning disable 0414
     bool isPaused;
     #pragma warning restore 0414
@@ -86,6 +87,14 @@ public class Movement : MonoBehaviour
         }
         else if(weaponType == WeaponType.Charge) {
             shootingCooldown = 0.1f;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("DamagingObjectFromEnemy"))
+        {
+            TakeDamage(1);
         }
     }
 
@@ -162,10 +171,13 @@ public class Movement : MonoBehaviour
         }
         else {
             Destroy(GameObject.Find("Beam"));
+            playerIsShooting = false;
         }
     }
 
     void FireBeam(UnityEngine.Vector2 mouseDirection) {
+        playerIsShooting = true;
+
         // Create a new GameObject for the beam if it doesn't exist yet
         GameObject beam = GameObject.Find("Beam");
         LineRenderer lineRenderer;
@@ -226,6 +238,8 @@ public class Movement : MonoBehaviour
         }
         else
         {
+            playerIsShooting = true;
+        
             // Play shooting sound
             AudioSource.PlayClipAtPoint(shootSound, transform.position);
             GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
@@ -238,6 +252,8 @@ public class Movement : MonoBehaviour
 
             bulletRb.AddForce(shootDirection * adjustedBulletSpeed, ForceMode2D.Impulse);
 
+            playerIsShooting = true;
+        
             /* For mana cooldown, not currently working
             if (currentMana == 0 && Input.GetMouseButton(0) && manaCooldownTimer < manaEmptyCooldown)
             {

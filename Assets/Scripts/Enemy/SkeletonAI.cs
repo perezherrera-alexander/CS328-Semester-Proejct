@@ -65,7 +65,13 @@ public class SkeletonAI : EnemyAI
     {
         if (skeletonState == SkeletonState.Walking)
         {
-            base.FixedUpdate();
+             rb.velocity = transform.up * speed;
+
+            if (target != null && target.CompareTag("Player"))
+            {
+                RotateToTarget();
+                AttackCooldown();
+            }
         }
         else
         {

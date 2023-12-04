@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GoblinAI : EnemyAI
@@ -66,10 +67,18 @@ public class GoblinAI : EnemyAI
         }
     }
 
+    protected override void RotateToTarget()
+    {
+        if (target.CompareTag("Player"))
+        {
+            base.RotateToTarget();
+        }
+    }
+
     private bool CanSeePlayer ()
     {
         // Raycast to check if there's a clear line of sight to the player
-        if (target != null)
+        if (target != null && target.CompareTag("Player"))
         {
             Vector2 directionToPlayer = target.position - transform.position;
             RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, Mathf.Infinity, LayerMask.GetMask("Player"));
