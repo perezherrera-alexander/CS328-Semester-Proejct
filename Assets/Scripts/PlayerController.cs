@@ -92,8 +92,10 @@ public class Movement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        Debug.Log("Player hit by enemy bullet");
         if (collision.gameObject.CompareTag("DamagingObjectFromEnemy"))
         {
+            
             TakeDamage(1);
         }
     }

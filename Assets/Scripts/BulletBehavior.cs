@@ -19,7 +19,6 @@ public class BulletBehavior : MonoBehaviour
         }
         else if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Goblin") || collision.gameObject.CompareTag("Boss"))
         {
-            
             Destroy(gameObject);
         }
     }
