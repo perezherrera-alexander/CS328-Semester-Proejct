@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading.Tasks;
 
 public class TheWizardAI : BossAI
 {
@@ -99,7 +100,7 @@ public class TheWizardAI : BossAI
     {
         if (Time.time - lastAttackTime >= attackCooldown && !isDoingAttack)
         {
-            int randomAttack = Random.Range(1, 3);
+            int randomAttack = Random.Range(1, 4);
 
             AllMighty(randomAttack);
         }
@@ -110,7 +111,10 @@ public class TheWizardAI : BossAI
         switch (randomAttack)
         {
             case 1:
-                StartCoroutine(ShootProjectiles());
+                ShootProjectiles();
+
+                beingUsedByBoss = false;
+                isDoingAttack = false;
                 break;
             case 2:
                 //StartCoroutine(ShootBeam());
@@ -124,11 +128,17 @@ public class TheWizardAI : BossAI
         }        
     }
 
-    private IEnumerator ShootProjectiles()
+    private void ShootProjectiles()
     {
         isDoingAttack = true;
         beingUsedByBoss = true;
         int randomNumberOfProjectiles = Random.Range(3, 12);
+        
+        StartCoroutine(SpawnProjectileLogic(randomNumberOfProjectiles));
+    }
+
+    private IEnumerator SpawnProjectileLogic(int randomNumberOfProjectiles)
+    {
         for (int i = 0; i < randomNumberOfProjectiles; i++)
         {
             GameObject bullet = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
@@ -141,49 +151,52 @@ public class TheWizardAI : BossAI
             Vector2 shootDirection = Quaternion.Euler(0, 0, randomAngle) * playerDirection;  // Apply random angle deviation
 
             bulletRb.velocity = shootDirection * adjustedBulletSpeed;
-            yield return new WaitForSeconds(0.1f);
+            
+            yield return new WaitForSeconds(0.2f);
         }
-        beingUsedByBoss = false;
-        isDoingAttack = false;
     }
 
-    private IEnumerator ShootBeam()
+    private IEnumerator Waiter(float waitTime) 
+    {
+        yield return new WaitForSeconds(waitTime);
+    }
+
+    private void ShootBeam()
     {
         isDoingAttack = true;
         GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
         projectile.GetComponent<Rigidbody2D>().velocity = transform.up * projectileSpeed;
-        yield return new WaitForSeconds(1f);
         isDoingAttack = false;
     }
 
-    private IEnumerator AOEAttack()
+    private void AOEAttack()
     {
         isDoingAttack = true;
-        GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-        projectile.GetComponent<Rigidbody2D>().velocity = transform.up * projectileSpeed;
-        yield return new WaitForSeconds(1f);
-        isDoingAttack = false;
-    }
-
-    private IEnumerator ShootBigProjectiles()
-    {
-        isDoingAttack = true;
-        for (int i = 0; i < 3; i++)
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 5f);
+        foreach (Collider2D collider in colliders)
         {
-            GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-            projectile.transform.localScale = new Vector3(2f, 2f, 2f);
-            projectile.GetComponent<Rigidbody2D>().velocity = transform.up * projectileSpeed;
-            yield return new WaitForSeconds(0.5f);
+            if (collider.CompareTag("Player"))
+            {
+                playerController.TakeDamage(5);
+            }
         }
+        isDoingAttack = false;
+    }
+
+    private void ShootBigProjectiles()
+    {
+        isDoingAttack = true;
+        GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        projectile.GetComponent<Rigidbody2D>().velocity = transform.up * projectileSpeed;
         isDoingAttack = false;
     }
 
     private void Teleport()
     {
         // Add logic to use Ability 2
-        // Example: Teleport within a 15 unit radius (if not obstructed)
-        Vector2 randomPosition = (Vector2)transform.position + Random.insideUnitCircle * 15f;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, randomPosition - (Vector2)transform.position, 15f);
+        // Example: Teleport within a 6 unit radius (if not obstructed)
+        Vector2 randomPosition = (Vector2)transform.position + Random.insideUnitCircle * 6f;
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, randomPosition - (Vector2)transform.position, 6f);
         
         if (hit.collider == null || !hit.collider.CompareTag("Wall"))
         {
