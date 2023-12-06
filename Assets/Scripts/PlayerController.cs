@@ -17,7 +17,7 @@ public class Movement : MonoBehaviour
     private Rigidbody2D rb;
 
     public int maxHealth = 20;
-    public int currentHealth;
+    public float currentHealth;
     public HealthBar healthBar;
 
     public float maxMana = 100;
@@ -96,7 +96,7 @@ public class Movement : MonoBehaviour
         if (collision.gameObject.CompareTag("DamagingObjectFromEnemy"))
         {
             
-            TakeDamage(1);
+            TakeDamage(0.1f);
         }
     }
 
@@ -276,7 +276,7 @@ public class Movement : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage) {
+    public void TakeDamage(float damage) {
         if (!isAlive) return;
         currentHealth -= damage;
     
