@@ -32,6 +32,8 @@ public class Movement : MonoBehaviour
     public float bulletSpeed = 10f;
     public float shootingCooldown = 0.05f;
     private float nextShotTime = 0f;
+    public float beamDamageTime = 0f;
+    private float timeSinceLastBeam = 0f;
     public float randomAngleRange = 5f;
     public float randomSpeedRange = 2f;
     public int bulletDamage = 2;
@@ -88,11 +90,11 @@ public class Movement : MonoBehaviour
         else if(weaponType == WeaponType.Charge) {
             shootingCooldown = 0.1f;
         }
+        timeSinceLastBeam += Time.deltaTime;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("Player hit by enemy bullet");
         if (collision.gameObject.CompareTag("DamagingObjectFromEnemy"))
         {
             
@@ -183,15 +185,12 @@ public class Movement : MonoBehaviour
         // Create a new GameObject for the beam if it doesn't exist yet
         GameObject beam = GameObject.Find("Beam");
         LineRenderer lineRenderer;
-        BoxCollider2D collider; // Colider is here so that later on we can check if the beam hit anything
         if(beam == null) {
             beam = new GameObject("Beam");
             lineRenderer = beam.AddComponent<LineRenderer>();
-            collider = beam.AddComponent<BoxCollider2D>();
         }
         else {
             lineRenderer = beam.GetComponent<LineRenderer>();
-            collider = beam.GetComponent<BoxCollider2D>();
         }
 
         // Set other properties of the LineRenderer, such as color, width, etc.
@@ -216,18 +215,66 @@ public class Movement : MonoBehaviour
         beamOffset = Quaternion.Euler(0, 0, rb.rotation) * beamOffset;
         lineRenderer.SetPosition(0, transform.position + beamOffset);
 
-        // Ignore collisions between the beam and the player
-        Physics2D.IgnoreCollision(collider, GetComponent<CircleCollider2D>());
-        // Raycast to the nearest object in the direction of the mouse and only look for walls and enemies
-        LayerMask mask = LayerMask.GetMask("Wall", "Enemy"); // Layer 8 & 9
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, maxBeamLength, mask);
 
-        if (hit.collider != null) { // If the raycast hit something, update the beam's end position and the collider's size
-            lineRenderer.SetPosition(1, hit.point);
-            collider.size = new Vector2(0.2f, hit.distance);
-        } else { // In case we don't hit anything, just make the beam (and collider) really long
+        LayerMask mask = LayerMask.GetMask("Wall", "Enemy", "Goblin", "Boss"); // Layer 8 & 9
+        // This mask wouldn't hit the suit of armor for some reason so I removed it.
+        // Raycast to the nearest object in the direction of the mouse
+        RaycastHit2D[] hit = Physics2D.RaycastAll(transform.position, transform.up, maxBeamLength);
+
+        bool hitWall = false;
+        float closestHitDistance = maxBeamLength;
+        List<GameObject> enemiesHit = new List<GameObject>();
+
+        // Find if the raycast hit a wall or an enemy. Set the beam to the closest wall. Add enemies to a list to damage them later
+        foreach(RaycastHit2D h in hit) {
+            if(h.collider.gameObject.CompareTag("Wall")) {
+                if(h.fraction < closestHitDistance) {
+                    closestHitDistance = h.fraction;
+                    lineRenderer.SetPosition(1, h.point);
+                    hitWall = true;
+                }
+            }
+            else if(h.collider.gameObject.CompareTag("Enemy") || h.collider.gameObject.CompareTag("Goblin")) {
+                enemiesHit.Add(h.collider.gameObject);
+            }
+        }
+        if(!hitWall) {
             lineRenderer.SetPosition(1, transform.position + transform.up * maxBeamLength);
-            collider.size = new Vector2(0.2f, maxBeamLength);
+        }
+        // Damage enemies hit by the beam (if any) but only once every interval (beamDamageTime)
+        if(enemiesHit.Count > 0 && timeSinceLastBeam > beamDamageTime) {
+            foreach(GameObject enemy in enemiesHit) {
+                if(enemy != null) {
+                    CreateBeamEffect(enemy.transform.position);
+                    if(enemy.GetComponent<EnemyAI>().enemyName == "Armor") {
+                        enemy.GetComponent<ArmorAI>().InflictDamage();
+                    }
+                    else if(enemy.GetComponent<EnemyAI>().enemyName == "Ghost") {
+                        enemy.GetComponent<GhostAI>().InflictDamage();
+                    }
+                    else if(enemy.GetComponent<EnemyAI>().enemyName == "Goblin") {
+                        enemy.GetComponent<GoblinAI>().TakeDamage();
+                    }
+                    else if(enemy.GetComponent<EnemyAI>().enemyName == "Minion") {
+                        enemy.GetComponent<MinionAI>().TakeDamage();
+                    }
+                    else if(enemy.GetComponent<EnemyAI>().enemyName == "Skeleton") {
+                        enemy.GetComponent<SkeletonAI>().InflictDamage();
+                    }
+                    else if(enemy.GetComponent<EnemyAI>().enemyName == "Skeleton King")
+                    {
+                        enemy.GetComponent<SkeletonKingAI>().TakeDamage();
+                    }
+                    else if(enemy.GetComponent<EnemyAI>().enemyName == "Wizard"){
+                        enemy.GetComponent<TheWizardAI>().TakeDamage();
+                    }
+                    else {
+                        Debug.Log("Uh oh, someone didn't add a case for this enemy (Alexander's fault)");
+                        //Debug.Log(enemy.GetComponent<EnemyAI>().enemyName);
+                    }
+                }
+            }
+            timeSinceLastBeam = 0;
         }
 
         // No need to destroy the beam, we'll reuse it as long as the player is holding down click. We'll destroy it later on if the player stop's clicking
@@ -311,7 +358,7 @@ public class Movement : MonoBehaviour
             StartCoroutine(ReloadSceneAfterDelay());
         }
     
-        healthBar.SetHealth(currentHealth);
+        healthBar.SetHealth((int)currentHealth);
     }
 
     private void CreateExplosionEffect() {
@@ -387,5 +434,43 @@ public class Movement : MonoBehaviour
             direction.Normalize(); // Otherwise the dash is faster when the mouse is further away from the player          
             rb.AddForce(direction * dashSpeed, ForceMode2D.Force);
         }
+    }
+
+    
+    private void CreateBeamEffect(Vector3 hitLocation) {
+        GameObject beamEffect = new GameObject("BeamEffect");
+        ParticleSystem particleSystem = beamEffect.AddComponent<ParticleSystem>();
+    
+        // Set the position of the effect to the hit location
+        beamEffect.transform.position = hitLocation;
+    
+        var main = particleSystem.main;
+        main.startSize = new ParticleSystem.MinMaxCurve(0.03f, 0.09f);
+        main.startSpeed = new ParticleSystem.MinMaxCurve(1f, 3f);
+        main.startColor = new Color(0.676f, 0.844f, 0.898f, 0.3f);
+        //main.remain
+        main.startLifetime = 0.08f;
+        //main.duration = 0.05f;
+
+        var emission = particleSystem.emission;
+        emission.rateOverTime = 200;
+
+    
+        // Create a simple red material for the particles
+        Material blueMaterial = new Material(Shader.Find("Particles/Standard Unlit"));
+        blueMaterial.color = new Color(0.676f, 0.844f, 0.898f, 0.3f);
+
+        particleSystem.GetComponent<ParticleSystemRenderer>().material = blueMaterial;
+
+        particleSystem.Play();
+        // Stop the particle system after 0.05 seconds
+        StartCoroutine(StopParticleSystemAfterDelay(particleSystem, 0.08f));
+    }
+
+    private IEnumerator StopParticleSystemAfterDelay(ParticleSystem particleSystem, float delay) {
+        yield return new WaitForSeconds(delay);
+    
+        // Stop the particle system
+        particleSystem.Stop();
     }
 }

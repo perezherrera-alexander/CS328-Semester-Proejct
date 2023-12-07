@@ -24,6 +24,7 @@ public class SkeletonAI : EnemyAI
     protected override void Start()
     {
         base.Start();
+        enemyName = "Skeleton";
 
         maxHealth = health;
         pileOfBonesHealth = 3 * maxHealth / 4;
@@ -92,6 +93,15 @@ public class SkeletonAI : EnemyAI
         else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown && skeletonState == SkeletonState.Walking)
         {
             playerController.TakeDamage(1);
+        }
+    }
+
+    public void InflictDamage()
+    {
+        health--;
+        if (health <= 0)
+        {
+            Die();
         }
     }
 

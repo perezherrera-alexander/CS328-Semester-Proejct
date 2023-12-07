@@ -20,6 +20,7 @@ public class ArmorAI : EnemyAI
     protected override void Start()
     {
         base.Start();
+        enemyName = "Armor";
     }
 
     protected override void Update()
@@ -92,6 +93,19 @@ public class ArmorAI : EnemyAI
         else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown && armorState == ArmorState.Walking)
         {
             playerController.TakeDamage(4);
+        }
+    }
+
+   public void InflictDamage()
+    {
+        //Debug.Log("Armor took damage");
+        if(armorState == ArmorState.Hardened)
+        {
+                // If the armor is hardened, do not take damage
+            return;
+        }
+        else {
+            TakeDamage();
         }
     }
 

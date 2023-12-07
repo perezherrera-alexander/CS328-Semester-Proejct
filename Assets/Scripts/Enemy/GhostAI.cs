@@ -12,13 +12,16 @@ public class GhostAI : EnemyAI
 
     public GhostState ghostState = GhostState.Floating;
 
+    #pragma warning disable 0414
     private bool isInvisible = false;
+    #pragma warning restore 0414
     private float floatSpeed;
     private float invisSpeed;
 
     protected override void Start()
     {
         base.Start();
+        enemyName = "Ghost";
 
         floatSpeed = speed * 1.15f;
         invisSpeed = speed / 1.15f;
@@ -66,6 +69,11 @@ public class GhostAI : EnemyAI
             // If the Ghost collides with a wall, change its state to invisible
             ghostState = GhostState.Invisible;
         }
+    }
+
+    public void InflictDamage()
+    {
+        TakeDamage();
     }
 
     private bool isInWall()

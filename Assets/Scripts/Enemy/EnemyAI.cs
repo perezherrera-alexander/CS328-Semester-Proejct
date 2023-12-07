@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -5,6 +6,7 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour {
     public Transform target;
+    public String enemyName;
     public float speed = 5f;
     public float rotateSpeed = 0.05f;
     protected Rigidbody2D rb;
@@ -77,7 +79,7 @@ public class EnemyAI : MonoBehaviour {
         }
     }
 
-    protected virtual void TakeDamage()
+    public virtual void TakeDamage()
     {
         health--;
 

@@ -32,6 +32,7 @@ public class SkeletonKingAI : BossAI
     protected override void Start()
     {
         base.Start();
+        enemyName = "Skeleton King";
         
         originalSpeed = speed;
 

@@ -13,6 +13,7 @@ public class GoblinAI : EnemyAI
     protected override void Start()
     {
         base.Start();
+        enemyName = "Goblin";
     }
 
     protected override void Update()
