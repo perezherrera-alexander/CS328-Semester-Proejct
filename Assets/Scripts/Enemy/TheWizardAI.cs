@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 
 public class TheWizardAI : BossAI
 {
@@ -14,6 +15,8 @@ public class TheWizardAI : BossAI
     public float teleportCooldown = 10f;
     private float lastTeleportTime;
     private bool isTeleporting = false;
+    private float attackCooldownTime = 1.5f;
+    private float lastAttackTimer = 0f;
 
     private float startHealth;
     private float startSpeed;
@@ -44,10 +47,10 @@ public class TheWizardAI : BossAI
         }
         if (isTeleporting)
         {
-            lastTeleportTime = Time.time;
+            lastTeleportTime = Time.deltaTime;
         }
 
-        if (Time.time - lastTeleportTime >= teleportCooldown && playerController.playerIsShooting)
+        if (Time.deltaTime - lastTeleportTime >= teleportCooldown && playerController.playerIsShooting)
         {
             Teleport();
         }
@@ -62,14 +65,27 @@ public class TheWizardAI : BossAI
             speed = startSpeed * halfHealthSpeedBuff * halfHealthSpeedBuff;
             teleportCooldown = 4f;
         }
+
+        if (!isDoingAttack && !beingUsedByBoss)
+        {
+            lastAttackTimer += Time.deltaTime;
+        }
+        else
+        {
+            lastAttackTimer = 0f;
+        }
     }
 
     protected override void RotateToTarget()
     {
-        Vector2 targetDir = target.position - transform.position;
-        float angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg - 90f;
-        Quaternion q = Quaternion.Euler(new Vector3(0, 0, angle));
-        transform.localRotation = Quaternion.Slerp(transform.localRotation, q, rotateSpeed);
+        if (target.CompareTag("Player"))
+        {
+            Vector2 targetDir = target.position - transform.position;
+            float angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg - 90f;
+            Quaternion q = Quaternion.Euler(new Vector3(0, 0, angle));
+            transform.localRotation = Quaternion.Slerp(transform.localRotation, q, rotateSpeed);
+
+        }
 
         float duration = Random.Range(0.5f, 1.5f);
 
@@ -98,9 +114,9 @@ public class TheWizardAI : BossAI
 
     protected override void AttackCooldown()
     {
-        if (Time.time - lastAttackTime >= attackCooldown && !isDoingAttack)
+        if (!isDoingAttack && lastAttackTimer >= attackCooldownTime)
         {
-            int randomAttack = Random.Range(1, 4);
+            int randomAttack = Random.Range(1, 3);
 
             AllMighty(randomAttack);
         }
@@ -117,78 +133,112 @@ public class TheWizardAI : BossAI
                 isDoingAttack = false;
                 break;
             case 2:
-                //StartCoroutine(ShootBeam());
+                //ShootBeam();
                 break;
             case 3:
-                //StartCoroutine(AOEAttack());
-                break;
-            case 4:
-                //StartCoroutine(ShootBigProjectiles());
+                //ShootGroupProjectiles();
+
+                beingUsedByBoss = false;
+                isDoingAttack = false;
                 break;
         }        
     }
 
     private void ShootProjectiles()
     {
-        isDoingAttack = true;
-        beingUsedByBoss = true;
-        int randomNumberOfProjectiles = Random.Range(3, 12);
-        
-        StartCoroutine(SpawnProjectileLogic(randomNumberOfProjectiles));
-    }
-
-    private IEnumerator SpawnProjectileLogic(int randomNumberOfProjectiles)
-    {
-        for (int i = 0; i < randomNumberOfProjectiles; i++)
+        if (target.CompareTag("Player"))
         {
-            GameObject bullet = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-            Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+            isDoingAttack = true;
+            beingUsedByBoss = true;
+            int randomNumberOfProjectiles = Random.Range(3, 12);
 
-            float randomAngle = Random.Range(-randomAngleRange, randomAngleRange);  // Get random angle deviation
-            float adjustedBulletSpeed = projectileSpeed + Random.Range(-randomSpeedRange, randomSpeedRange);  // Get random speed deviation 
+            float trackTime = 0f;
+            int i = 0;
 
-            Vector2 playerDirection = (target.transform.position - transform.position).normalized;  // Get direction towards the player
-            Vector2 shootDirection = Quaternion.Euler(0, 0, randomAngle) * playerDirection;  // Apply random angle deviation
+            while (i < randomNumberOfProjectiles)
+            {
+                trackTime += Time.time;
 
-            bulletRb.velocity = shootDirection * adjustedBulletSpeed;
-            
-            yield return new WaitForSeconds(0.2f);
+                if (trackTime % 1.5f == 0)
+                {
+                    SpawnProjectileLogic();
+
+                    i++;
+                }
+            }
+
+            lastAttackTimer = 0f;
         }
     }
 
-    private IEnumerator Waiter(float waitTime) 
+    private void SpawnProjectileLogic()
     {
-        yield return new WaitForSeconds(waitTime);
+        GameObject bullet = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+
+        float randomAngle = Random.Range(-randomAngleRange, randomAngleRange);  // Get random angle deviation
+        float adjustedBulletSpeed = projectileSpeed + Random.Range(-randomSpeedRange, randomSpeedRange);  // Get random speed deviation 
+
+        Vector2 playerDirection = (target.transform.position - transform.position).normalized;  // Get direction towards the player
+        Vector2 shootDirection = Quaternion.Euler(0, 0, randomAngle) * playerDirection;  // Apply random angle deviation
+
+        bulletRb.velocity = shootDirection * adjustedBulletSpeed;
+
+        if (target.CompareTag("Player"))
+        {
+            return;
+        }
+
     }
 
     private void ShootBeam()
     {
-        isDoingAttack = true;
-        GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-        projectile.GetComponent<Rigidbody2D>().velocity = transform.up * projectileSpeed;
-        isDoingAttack = false;
-    }
-
-    private void AOEAttack()
-    {
-        isDoingAttack = true;
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 5f);
-        foreach (Collider2D collider in colliders)
+        if (target.CompareTag("Player"))
         {
-            if (collider.CompareTag("Player"))
-            {
-                playerController.TakeDamage(5);
-            }
+            isDoingAttack = true;
+            beingUsedByBoss = true;
+            GameObject beam = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+            beam.GetComponent<Rigidbody2D>().velocity = transform.up * projectileSpeed;
+            isDoingAttack = false;
         }
-        isDoingAttack = false;
     }
 
-    private void ShootBigProjectiles()
+    private void ShootGroupProjectiles()
     {
-        isDoingAttack = true;
-        GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-        projectile.GetComponent<Rigidbody2D>().velocity = transform.up * projectileSpeed;
-        isDoingAttack = false;
+        if (target.CompareTag("Player"))
+        {
+            isDoingAttack = true;
+            beingUsedByBoss = true;
+            int randomNumberOfProjectiles = Random.Range(3, 12);
+            
+            for (int i = 0; i < randomNumberOfProjectiles; i++)
+            {
+                StartCoroutine(SpawnProjectileGroupLogic());
+            }
+
+            lastAttackTimer = 0f;
+        }
+    }
+
+    private IEnumerator SpawnProjectileGroupLogic()
+    {
+        GameObject bullet = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+
+        float randomAngle = Random.Range(-randomAngleRange, randomAngleRange);  // Get random angle deviation
+        float adjustedBulletSpeed = projectileSpeed + Random.Range(-randomSpeedRange, randomSpeedRange);  // Get random speed deviation 
+
+        Vector2 playerDirection = (target.transform.position - transform.position).normalized;  // Get direction towards the player
+        Vector2 shootDirection = Quaternion.Euler(0, 0, randomAngle) * playerDirection;  // Apply random angle deviation
+
+        bulletRb.velocity = shootDirection * adjustedBulletSpeed;
+
+        if (target.CompareTag("Player"))
+        {
+            yield return new Break();
+        }
+
+        yield return new WaitForSeconds(0.2f);
     }
 
     private void Teleport()
@@ -241,7 +291,7 @@ public class TheWizardAI : BossAI
         } 
         else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown)
         {
-            playerController.TakeDamage(3);
+            playerController.TakeDamage(1);
         }
     }
 
