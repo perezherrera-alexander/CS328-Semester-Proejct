@@ -148,6 +148,14 @@ public class TheWizardAI : BossAI
     {
         if (target.CompareTag("Player"))
         {
+            /// <summary>
+            /// This is the original code for the ShootProjectiles() method
+            /// This code sets a flag to indicate that an attack is being performed 
+            /// and that the attack is being used by a boss. It then (should) generate
+            /// a random number of projectiles and spawns them at regular intervals - like
+            /// how the player shoots. It then resets a timer for the last attack.
+            /// </summary>
+            /*
             isDoingAttack = true;
             beingUsedByBoss = true;
             int randomNumberOfProjectiles = Random.Range(3, 12);
@@ -167,7 +175,7 @@ public class TheWizardAI : BossAI
                 }
             }
 
-            lastAttackTimer = 0f;
+            lastAttackTimer = 0f; */
         }
     }
 
@@ -197,9 +205,8 @@ public class TheWizardAI : BossAI
         {
             isDoingAttack = true;
             beingUsedByBoss = true;
-            GameObject beam = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-            beam.GetComponent<Rigidbody2D>().velocity = transform.up * projectileSpeed;
-            isDoingAttack = false;
+            
+            // Use logic from PlayerController.cs to shoot a beam
         }
     }
 
