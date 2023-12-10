@@ -7,7 +7,6 @@ public class NextLevelWall : MonoBehaviour
 {
     private Transform target;
 
-    // Start is called before the first frame update
     void Start()
     {
         if (target == null)
@@ -16,7 +15,6 @@ public class NextLevelWall : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (target == null)
