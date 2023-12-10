@@ -472,5 +472,7 @@ public class Movement : MonoBehaviour
     
         // Stop the particle system
         particleSystem.Stop();
+        // Delte the particle system after 1 second
+        Destroy(particleSystem.gameObject, 1f);
     }
 }
