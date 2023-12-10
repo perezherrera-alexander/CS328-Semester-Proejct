@@ -33,6 +33,7 @@ public class Movement : MonoBehaviour
     public float shootingCooldown = 0.05f;
     private float nextShotTime = 0f;
     public float beamDamageTime = 0f;
+    public float beamManaUse = 0.3f;
     private float timeSinceLastBeam = 0f;
     public float randomAngleRange = 5f;
     public float randomSpeedRange = 2f;
@@ -91,6 +92,16 @@ public class Movement : MonoBehaviour
             shootingCooldown = 0.1f;
         }
         timeSinceLastBeam += Time.deltaTime;
+
+        // Keyboard input for switching weapons
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            weaponType = WeaponType.Basic;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            weaponType = WeaponType.Beam;
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -181,6 +192,18 @@ public class Movement : MonoBehaviour
 
     void FireBeam(UnityEngine.Vector2 mouseDirection) {
         playerIsShooting = true;
+
+        // Make the beam use mana
+        if(currentMana - beamManaUse <= 0) {
+            currentMana = 0;
+            Destroy(GameObject.Find("Beam"));
+            return;
+        }
+        else {
+            currentMana -= beamManaUse;
+        }
+        
+
 
         // Create a new GameObject for the beam if it doesn't exist yet
         GameObject beam = GameObject.Find("Beam");

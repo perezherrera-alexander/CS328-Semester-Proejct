@@ -103,6 +103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e92dc7968a86104caa46b33d8b5c87a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isAlive: 1
   movementSpeed: 1
   dashSpeed: 200
   dashDuration: 5
@@ -121,9 +122,11 @@ MonoBehaviour:
   weaponType: 0
   bulletSpeed: 9
   shootingCooldown: 0.05
+  beamDamageTime: 0.1
   randomAngleRange: 6
   randomSpeedRange: 1
   bulletDamage: 2
+  playerIsShooting: 0
   shootSound: {fileID: 8300000, guid: 833361d863e8c9a4398ce071a6236f4b, type: 3}
   dashSound: {fileID: 8300000, guid: 0691701fc9fe47849942eebe7ba1773f, type: 3}
   playerDeathSound: {fileID: 8300000, guid: cf90627b892a64e47986733f3107a485, type: 3}
@@ -171,7 +174,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0514cb21357f52459c4cff90880c1f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
 --- !u!50 &5088870707598306816
 Rigidbody2D:
   serializedVersion: 4
