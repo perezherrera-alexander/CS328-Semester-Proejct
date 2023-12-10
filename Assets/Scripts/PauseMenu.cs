@@ -45,13 +45,15 @@ public class PauseMenu : MonoBehaviour {
         SceneManager.LoadScene("MainMenu");
     }
 
+/*
     public void ToggleMusic()
     {
-        audioManager.musicSource.mute = !audioManager.musicSource.mute;
+        audioManager.s.source.mute = !audioManager.s.source.mute;
     }
 
     public void MusicVolume(float volume)
     {
-        audioManager.musicSource.volume = volume;
+        audioManager.s.source.volume = volume;
     }
+*/
 }
