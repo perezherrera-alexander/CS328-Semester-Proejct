@@ -4,6 +4,9 @@ using UnityEngine;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 
+// TODO:
+// Speed isnt working! set it to zero, and he still moves
+// Beam shouldnt be instant, maybe some warning somehow, or maybe the beam "sweeps" from one direction to another
 public class TheWizardAI : BossAI
 {
     public GameObject projectilePrefab;
@@ -15,7 +18,7 @@ public class TheWizardAI : BossAI
     public float teleportCooldown = 10f;
     private float lastTeleportTime;
     private bool isTeleporting = false;
-    private float attackCooldownTime = 1.5f;
+    private float attackCooldownTime = 0.5f;
     private float lastAttackTimer = 0f;
 
     private float startHealth;
@@ -26,6 +29,8 @@ public class TheWizardAI : BossAI
     public float chanceToDodgeAttack = 0.1f;
     private bool isMoving = false;
 
+    public float beamDuration = 0.5f;
+
     protected override void Start()
     {
         base.Start();
@@ -33,6 +38,7 @@ public class TheWizardAI : BossAI
         health = 150;
 
         attackCooldown = 5f;
+        attackCooldownTime = Random.Range(0.5f, 2.5f);
 
         startHealth = health;
         startSpeed = speed;
@@ -117,7 +123,6 @@ public class TheWizardAI : BossAI
         if (!isDoingAttack && lastAttackTimer >= attackCooldownTime)
         {
             int randomAttack = Random.Range(1, 3);
-
             AllMighty(randomAttack);
         }
     }
@@ -128,56 +133,40 @@ public class TheWizardAI : BossAI
         {
             case 1:
                 ShootProjectiles();
-
-                beingUsedByBoss = false;
-                isDoingAttack = false;
                 break;
             case 2:
-                //ShootBeam();
+                ShootBeam();
                 break;
-            case 3:
-                //ShootGroupProjectiles();
-
-                beingUsedByBoss = false;
-                isDoingAttack = false;
-                break;
-        }        
+        }    
+        
+        beingUsedByBoss = false;    
     }
 
-    private void ShootProjectiles()
+private bool isShooting = false;
+
+private IEnumerator ShootProjectilesCoroutine()
+{
+    isShooting = true;
+    isDoingAttack = true;
+    beingUsedByBoss = true;
+
+    int randomNumberOfProjectiles = Random.Range(3, 12);
+    for (int i = 0; i < randomNumberOfProjectiles; i++)
     {
-        if (target.CompareTag("Player"))
-        {
-            /// <summary>
-            /// This is the original code for the ShootProjectiles() method
-            /// This code sets a flag to indicate that an attack is being performed 
-            /// and that the attack is being used by a boss. It then (should) generate
-            /// a random number of projectiles and spawns them at regular intervals - like
-            /// how the player shoots. It then resets a timer for the last attack.
-            /// </summary>
-            /*
-            isDoingAttack = true;
-            beingUsedByBoss = true;
-            int randomNumberOfProjectiles = Random.Range(3, 12);
-
-            float trackTime = 0f;
-            int i = 0;
-
-            while (i < randomNumberOfProjectiles)
-            {
-                trackTime += Time.time;
-
-                if (trackTime % 1.5f == 0)
-                {
-                    SpawnProjectileLogic();
-
-                    i++;
-                }
-            }
-
-            lastAttackTimer = 0f; */
-        }
+        SpawnProjectileLogic();
+        yield return new WaitForSeconds(shootingCooldown);
     }
+
+    lastAttackTimer = 0f;
+    isDoingAttack = false;
+    beingUsedByBoss = false;
+    isShooting = false;
+}
+
+private void ShootProjectiles()
+{
+    if (!isShooting) StartCoroutine(ShootProjectilesCoroutine());
+}
 
     private void SpawnProjectileLogic()
     {
@@ -192,70 +181,75 @@ public class TheWizardAI : BossAI
 
         bulletRb.velocity = shootDirection * adjustedBulletSpeed;
 
-        if (target.CompareTag("Player"))
-        {
-            return;
-        }
-
+        if (target.CompareTag("Player")) return;
     }
 
-    private void ShootBeam()
+private void ShootBeam()
+{
+    if (target.CompareTag("Player"))
     {
-        if (target.CompareTag("Player"))
-        {
-            isDoingAttack = true;
-            beingUsedByBoss = true;
-            
-            // Use logic from PlayerController.cs to shoot a beam
-        }
-    }
+        isDoingAttack = true;
+        beingUsedByBoss = true;
 
-    private void ShootGroupProjectiles()
-    {
-        if (target.CompareTag("Player"))
-        {
-            isDoingAttack = true;
-            beingUsedByBoss = true;
-            int randomNumberOfProjectiles = Random.Range(3, 12);
-            
-            for (int i = 0; i < randomNumberOfProjectiles; i++)
-            {
-                StartCoroutine(SpawnProjectileGroupLogic());
-            }
-
-            lastAttackTimer = 0f;
-        }
-    }
-
-    private IEnumerator SpawnProjectileGroupLogic()
-    {
-        GameObject bullet = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-
-        float randomAngle = Random.Range(-randomAngleRange, randomAngleRange);  // Get random angle deviation
-        float adjustedBulletSpeed = projectileSpeed + Random.Range(-randomSpeedRange, randomSpeedRange);  // Get random speed deviation 
-
-        Vector2 playerDirection = (target.transform.position - transform.position).normalized;  // Get direction towards the player
-        Vector2 shootDirection = Quaternion.Euler(0, 0, randomAngle) * playerDirection;  // Apply random angle deviation
-
-        bulletRb.velocity = shootDirection * adjustedBulletSpeed;
-
-        if (target.CompareTag("Player"))
-        {
-            yield return new Break();
+        GameObject beam = GameObject.Find("EnemyBeam");
+        LineRenderer lineRenderer;
+        if (beam == null) {
+            beam = new GameObject("EnemyBeam");
+            lineRenderer = beam.AddComponent<LineRenderer>();
+            lineRenderer.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+            lineRenderer.startColor = Color.red;
+            lineRenderer.endColor = Color.yellow;
+            lineRenderer.startWidth = 0.2f;
+            lineRenderer.endWidth = 0.2f;
+            lineRenderer.colorGradient = new Gradient {
+                colorKeys = new [] { new GradientColorKey(lineRenderer.startColor, 0.0f), new GradientColorKey(lineRenderer.endColor, 1.0f) },
+                alphaKeys = new [] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
+            };
+        } else {
+            lineRenderer = beam.GetComponent<LineRenderer>();
         }
 
-        yield return new WaitForSeconds(0.2f);
+        Vector3 beamOffset = new Vector3(0f, 0.5f, 0f);
+        lineRenderer.SetPosition(0, transform.position + beamOffset);
+        float beamLength = 5f;
+        LayerMask mask = LayerMask.GetMask("Wall", "Player");
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, (target.transform.position - transform.position).normalized, beamLength, mask);
+        if (hit.collider != null) {
+            if (hit.collider.gameObject.CompareTag("Player")) hit.collider.gameObject.GetComponent<Movement>().TakeDamage(2f);
+            lineRenderer.SetPosition(1, hit.point);
+        }
+
+        StartCoroutine(DeactivateBeam(beam, beamDuration));
     }
+}
+
+private IEnumerator DeactivateBeam(GameObject beam, float duration)
+{
+    yield return new WaitForSeconds(duration);
+
+    // After the duration, deactivate the beam
+    if (beam != null) {
+        LineRenderer lineRenderer = beam.GetComponent<LineRenderer>();
+        if (lineRenderer != null) {
+            lineRenderer.SetPosition(0, Vector3.zero);
+            lineRenderer.SetPosition(1, Vector3.zero);
+        }
+        beam.SetActive(false);
+    }
+    isDoingAttack = false;
+    beingUsedByBoss = false;
+}
 
     private void Teleport()
     {
         // Add logic to use Ability 2
         // Example: Teleport within a 6 unit radius (if not obstructed)
-        Vector2 randomPosition = (Vector2)transform.position + Random.insideUnitCircle * 6f;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, randomPosition - (Vector2)transform.position, 6f);
+        float randomDistance = Random.Range(1f, 4f);
+        Vector2 randomPosition = (Vector2)transform.position + Random.insideUnitCircle * randomDistance;
+        LayerMask mask = LayerMask.GetMask("Wall", "Player");
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, randomPosition - (Vector2)transform.position, randomDistance, mask);
         
-        if (hit.collider == null || !hit.collider.CompareTag("Wall"))
+        if (hit.collider == null || !hit.collider.gameObject.CompareTag("Wall"))
         {
             transform.position = randomPosition;
             lastTeleportTime = Time.time; // Update the last teleport time
