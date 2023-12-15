@@ -1,24 +1,30 @@
-using UnityEngine.Audio;
 using System;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
-public class AudioManager : MonoBehaviour {
+public class AudioManager : MonoBehaviour
+{
     public Sound[] sounds;
 
     public static AudioManager instance;
 
-    public void Awake() {
-        if (instance == null) {
+    public void Awake()
+    {
+        if (instance == null)
+        {
             instance = this;
-        } else {
+        }
+        else
+        {
             Destroy(gameObject);
             return;
         }
 
         DontDestroyOnLoad(gameObject);
 
-        foreach (Sound s in sounds) {
+        foreach (Sound s in sounds)
+        {
             s.source = gameObject.AddComponent<AudioSource>();
             s.source.clip = s.clip;
             s.source.volume = s.volume;
@@ -27,29 +33,52 @@ public class AudioManager : MonoBehaviour {
         }
     }
 
-    private void Start() {
-        if (SceneManager.GetActiveScene().name == "MainMenu" || SceneManager.GetActiveScene().name == "LevelSelect") {
+    private void Start()
+    {
+        if (
+            SceneManager.GetActiveScene().name == "MainMenu"
+            || SceneManager.GetActiveScene().name == "LevelSelect"
+        )
+        {
             Play("MenuMusic");
-        } else {
+        }
+        else
+        {
             Play("GameMusic");
         }
     }
 
-    private void Update() {
-        if ((SceneManager.GetActiveScene().name == "MainMenu" || SceneManager.GetActiveScene().name == "LevelSelect") && GetCurrentlyPlaying() != "MenuMusic") {
+    private void Update()
+    {
+        if (
+            (
+                SceneManager.GetActiveScene().name == "MainMenu"
+                || SceneManager.GetActiveScene().name == "LevelSelect"
+            )
+            && GetCurrentlyPlaying() != "MenuMusic"
+        )
+        {
             Stop("Gameplay");
 
             Play("MainMenu");
-        } else if (SceneManager.GetActiveScene().name != "MainMenu" && SceneManager.GetActiveScene().name != "LevelSelect" && GetCurrentlyPlaying() != "GameMusic") {
+        }
+        else if (
+            SceneManager.GetActiveScene().name != "MainMenu"
+            && SceneManager.GetActiveScene().name != "LevelSelect"
+            && GetCurrentlyPlaying() != "GameMusic"
+        )
+        {
             Stop("MenuMusic");
 
             Play("GameMusic");
         }
     }
 
-    public void Play(string name) {
+    public void Play(string name)
+    {
         Sound s = Array.Find(sounds, sound => sound.name == name);
-        if (s == null) {
+        if (s == null)
+        {
             Debug.LogWarning("Sound: " + name + " not found!");
             return;
         }
@@ -66,27 +95,33 @@ public class AudioManager : MonoBehaviour {
         s.source.Play();
     }
 
-    public void Stop(string name) {
+    public void Stop(string name)
+    {
         Sound s = Array.Find(sounds, sound => sound.name == name);
 
         s.source.Stop();
     }
 
-    public void SetVolume(string name, float volume) {
+    public void SetVolume(string name, float volume)
+    {
         Sound s = Array.Find(sounds, sound => sound.name == name);
 
         s.source.volume = volume;
     }
 
-    public float GetVolume(string name) {
+    public float GetVolume(string name)
+    {
         Sound s = Array.Find(sounds, sound => sound.name == name);
 
         return s.source.volume;
     }
 
-    public string GetCurrentlyPlaying() {
-        foreach (Sound s in sounds) {
-            if (s.source.isPlaying) {
+    public string GetCurrentlyPlaying()
+    {
+        foreach (Sound s in sounds)
+        {
+            if (s.source.isPlaying)
+            {
                 return s.name;
             }
         }

@@ -28,7 +28,8 @@ public class GoblinAI : EnemyAI
         if (lastAttackTime > attackCooldown)
         {
             isAttacking = false;
-        } else if (lastAttackTime < attackCooldown)
+        }
+        else if (lastAttackTime < attackCooldown)
         {
             isAttacking = true;
         }
@@ -59,7 +60,7 @@ public class GoblinAI : EnemyAI
                     // If the Goblin is not in a pack, check if there are other Goblins nearby
                     SenseOtherGoblins();
                 }
-            } 
+            }
             else
             {
                 // If the Goblin cannot see the player, check if there are other Goblins nearby
@@ -76,13 +77,18 @@ public class GoblinAI : EnemyAI
         }
     }
 
-    private bool CanSeePlayer ()
+    private bool CanSeePlayer()
     {
         // Raycast to check if there's a clear line of sight to the player
         if (target != null && target.CompareTag("Player"))
         {
             Vector2 directionToPlayer = target.position - transform.position;
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, Mathf.Infinity, LayerMask.GetMask("Player"));
+            RaycastHit2D hit = Physics2D.Raycast(
+                transform.position,
+                directionToPlayer,
+                Mathf.Infinity,
+                LayerMask.GetMask("Player")
+            );
 
             if (hit.collider != null && hit.collider.CompareTag("Wall"))
             {
@@ -98,9 +104,13 @@ public class GoblinAI : EnemyAI
         return false;
     }
 
-    private void SenseOtherGoblins() 
+    private void SenseOtherGoblins()
     {
-        Collider2D[] goblins = Physics2D.OverlapCircleAll(transform.position, goblinCheckRadius, LayerMask.GetMask("Goblin"));
+        Collider2D[] goblins = Physics2D.OverlapCircleAll(
+            transform.position,
+            goblinCheckRadius,
+            LayerMask.GetMask("Goblin")
+        );
 
         if (goblins.Length > 1)
         {
@@ -118,7 +128,11 @@ public class GoblinAI : EnemyAI
     private void MoveToGoblin()
     {
         // Find the closest Goblin
-        Collider2D[] goblins = Physics2D.OverlapCircleAll(transform.position, goblinCheckRadius, LayerMask.GetMask("Goblin"));
+        Collider2D[] goblins = Physics2D.OverlapCircleAll(
+            transform.position,
+            goblinCheckRadius,
+            LayerMask.GetMask("Goblin")
+        );
         float closestDistance = Mathf.Infinity;
         Transform closestGoblin = null;
 
@@ -167,7 +181,7 @@ public class GoblinAI : EnemyAI
 
     protected override void Die()
     {
-        base.Die(); 
+        base.Die();
 
         // Give player back mana
         playerController.currentMana += 10;

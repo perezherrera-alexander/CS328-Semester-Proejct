@@ -6,7 +6,7 @@ public class BossWall : MonoBehaviour
 {
     void Update()
     {
-        if(GameObject.FindGameObjectWithTag("Boss") == null)
+        if (GameObject.FindGameObjectWithTag("Boss") == null)
         {
             Destroy(gameObject);
         }

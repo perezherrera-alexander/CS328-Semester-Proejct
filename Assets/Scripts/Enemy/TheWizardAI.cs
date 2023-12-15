@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class TheWizardAI : BossAI
@@ -23,7 +23,7 @@ public class TheWizardAI : BossAI
     public float halfHealthSpeedBuff = 1.2f;
     private bool isDoingAttack = false;
     public float chanceToDeflectAttack = 0.05f;
-    public float chanceToDodgeAttack = 0.1f;
+    public float chanceToDodgeAttack = 0.4f;
     private bool isMoving = false;
 
     public float beamDuration = 0.5f;
@@ -81,7 +81,6 @@ public class TheWizardAI : BossAI
         }
     }
 
-    
     protected override void RotateToTarget()
     {
         if (target.CompareTag("Player"))
@@ -90,7 +89,6 @@ public class TheWizardAI : BossAI
             float angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg - 90f;
             Quaternion q = Quaternion.Euler(new Vector3(0, 0, angle));
             transform.localRotation = Quaternion.Slerp(transform.localRotation, q, rotateSpeed);
-
         }
 
         float duration = Random.Range(0.5f, 1.5f);
@@ -137,9 +135,9 @@ public class TheWizardAI : BossAI
             case 2:
                 StartCoroutine(ShootBeam());
                 break;
-        }    
-        
-        beingUsedByBoss = false;    
+        }
+
+        beingUsedByBoss = false;
     }
 
     private bool isShooting = false;
@@ -165,7 +163,8 @@ public class TheWizardAI : BossAI
 
     private void ShootProjectiles()
     {
-        if (!isShooting) StartCoroutine(ShootProjectilesCoroutine());
+        if (!isShooting)
+            StartCoroutine(ShootProjectilesCoroutine());
     }
 
     private void SpawnProjectileLogic()
@@ -173,15 +172,17 @@ public class TheWizardAI : BossAI
         GameObject bullet = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
 
-        float randomAngle = Random.Range(-randomAngleRange, randomAngleRange);  // Get random angle deviation
-        float adjustedBulletSpeed = projectileSpeed + Random.Range(-randomSpeedRange, randomSpeedRange);  // Get random speed deviation 
+        float randomAngle = Random.Range(-randomAngleRange, randomAngleRange); // Get random angle deviation
+        float adjustedBulletSpeed =
+            projectileSpeed + Random.Range(-randomSpeedRange, randomSpeedRange); // Get random speed deviation
 
-        Vector2 playerDirection = (target.transform.position - transform.position).normalized;  // Get direction towards the player
-        Vector2 shootDirection = Quaternion.Euler(0, 0, randomAngle) * playerDirection;  // Apply random angle deviation
+        Vector2 playerDirection = (target.transform.position - transform.position).normalized; // Get direction towards the player
+        Vector2 shootDirection = Quaternion.Euler(0, 0, randomAngle) * playerDirection; // Apply random angle deviation
 
         bulletRb.velocity = shootDirection * adjustedBulletSpeed;
 
-        if (target.CompareTag("Player")) return;
+        if (target.CompareTag("Player"))
+            return;
     }
 
     private IEnumerator ShootBeam()
@@ -202,17 +203,26 @@ public class TheWizardAI : BossAI
             {
                 beam = new GameObject("EnemyBeam");
                 lineRenderer = beam.AddComponent<LineRenderer>();
-                lineRenderer.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+                lineRenderer.material = new Material(
+                    Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply")
+                );
                 lineRenderer.startColor = Color.red;
                 lineRenderer.endColor = Color.yellow;
                 lineRenderer.colorGradient = new Gradient
                 {
-                    colorKeys = new[] { new GradientColorKey(lineRenderer.startColor, 0.0f), new GradientColorKey(lineRenderer.endColor, 1.0f) },
-                    alphaKeys = new[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
+                    colorKeys = new[]
+                    {
+                        new GradientColorKey(lineRenderer.startColor, 0.0f),
+                        new GradientColorKey(lineRenderer.endColor, 1.0f)
+                    },
+                    alphaKeys = new[]
+                    {
+                        new GradientAlphaKey(1.0f, 0.0f),
+                        new GradientAlphaKey(1.0f, 1.0f)
+                    }
                 };
                 lineRenderer.startWidth = 0.2f;
                 lineRenderer.endWidth = 0.2f;
-
             }
             else
             {
@@ -222,20 +232,31 @@ public class TheWizardAI : BossAI
             bool foundPlayer = false;
             Vector3 beamOffset = new Vector3(0f, 0.5f, 0f);
             lineRenderer.SetPosition(0, transform.position + beamOffset);
-            float beamLength = 5f;
+            float beamLength = 7f;
             LayerMask mask = LayerMask.GetMask("Wall", "Player");
-            RaycastHit2D[] hit = Physics2D.RaycastAll(transform.position, (target.transform.position - transform.position).normalized, beamLength, mask);
+            RaycastHit2D[] hit = Physics2D.RaycastAll(
+                transform.position,
+                (target.transform.position - transform.position).normalized,
+                beamLength,
+                mask
+            );
             foreach (RaycastHit2D h in hit)
             {
                 if (h.collider != null)
                 {
-                    if (h.collider.gameObject.CompareTag("Player")) h.collider.gameObject.GetComponent<Movement>().TakeDamage(2f);
+                    if (h.collider.gameObject.CompareTag("Player"))
+                        h.collider.gameObject.GetComponent<Movement>().TakeDamage(2f);
                     lineRenderer.SetPosition(1, h.point);
                     foundPlayer = true;
                     break;
                 }
             }
-            if (!foundPlayer) lineRenderer.SetPosition(1, transform.position + (target.transform.position - transform.position).normalized * beamLength);
+            if (!foundPlayer)
+                lineRenderer.SetPosition(
+                    1,
+                    transform.position
+                        + (target.transform.position - transform.position).normalized * beamLength
+                );
 
             StartCoroutine(DoAThingOverTime(lineRenderer, beamDuration));
             StartCoroutine(DeactivateBeam(beam, beamDuration));
@@ -248,9 +269,11 @@ public class TheWizardAI : BossAI
         yield return new WaitForSeconds(duration);
 
         // After the duration, deactivate the beam
-        if (beam != null) {
+        if (beam != null)
+        {
             LineRenderer lineRenderer = beam.GetComponent<LineRenderer>();
-            if (lineRenderer != null) {
+            if (lineRenderer != null)
+            {
                 lineRenderer.SetPosition(0, Vector3.zero);
                 lineRenderer.SetPosition(1, Vector3.zero);
             }
@@ -264,11 +287,17 @@ public class TheWizardAI : BossAI
     {
         // Add logic to use Ability 2
         // Example: Teleport within a 6 unit radius (if not obstructed)
-        float randomDistance = Random.Range(1f, 4f);
-        Vector2 randomPosition = (Vector2)transform.position + Random.insideUnitCircle * randomDistance;
+        float randomDistance = Random.Range(2f, 9f);
+        Vector2 randomPosition =
+            (Vector2)transform.position + Random.insideUnitCircle * randomDistance;
         LayerMask mask = LayerMask.GetMask("Wall", "Player");
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, randomPosition - (Vector2)transform.position, randomDistance, mask);
-        
+        RaycastHit2D hit = Physics2D.Raycast(
+            transform.position,
+            randomPosition - (Vector2)transform.position,
+            randomDistance,
+            mask
+        );
+
         if (hit.collider == null || !hit.collider.gameObject.CompareTag("Wall"))
         {
             transform.position = randomPosition;
@@ -282,7 +311,6 @@ public class TheWizardAI : BossAI
         {
             Debug.Log("Health: " + health);
             TakeDamage();
-            /*
             float randInt = Random.Range(0, 1);
             if (randInt == 0)
             {
@@ -312,8 +340,7 @@ public class TheWizardAI : BossAI
                     TakeDamage();
                 }
             }
-            */
-        } 
+        }
         else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown)
         {
             playerController.TakeDamage(2);
@@ -328,13 +355,14 @@ public class TheWizardAI : BossAI
         SceneManager.LoadScene("EndScreen");
     }
 
-    private void CreateBeamEffect(Vector3 hitLocation) {
+    private void CreateBeamEffect(Vector3 hitLocation)
+    {
         GameObject beamEffect = new GameObject("BeamEffect");
         ParticleSystem particleSystem = beamEffect.AddComponent<ParticleSystem>();
-    
+
         // Set the position of the effect to the hit location
         beamEffect.transform.position = hitLocation;
-    
+
         var main = particleSystem.main;
         main.startSize = new ParticleSystem.MinMaxCurve(0.03f, 0.09f);
         main.startSpeed = new ParticleSystem.MinMaxCurve(1f, 3f);
@@ -346,7 +374,6 @@ public class TheWizardAI : BossAI
         var emission = particleSystem.emission;
         emission.rateOverTime = 200;
 
-    
         // Create a simple red material for the particles
         Material redMaterial = new Material(Shader.Find("Particles/Standard Unlit"));
         redMaterial.color = Color.red;
@@ -358,30 +385,38 @@ public class TheWizardAI : BossAI
         StartCoroutine(StopParticleSystemAfterDelay(particleSystem, 0.08f));
     }
 
-    private IEnumerator StopParticleSystemAfterDelay(ParticleSystem particleSystem, float delay) {
+    private IEnumerator StopParticleSystemAfterDelay(ParticleSystem particleSystem, float delay)
+    {
         yield return new WaitForSeconds(delay);
-    
+
         // Stop the particle system
         particleSystem.Stop();
         // Delte the particle system after 1 second
         Destroy(particleSystem.gameObject, 1f);
     }
 
-    IEnumerator DoAThingOverTime(LineRenderer lineRenderer, float duration) {
-        for (float t=0f;t<duration;t+=Time.deltaTime) {
-            float normalizedTime = t/duration;
+    IEnumerator DoAThingOverTime(LineRenderer lineRenderer, float duration)
+    {
+        for (float t = 0f; t < duration; t += Time.deltaTime)
+        {
+            float normalizedTime = t / duration;
             //right here, you can now use normalizedTime as the third parameter in any Lerp from start to end
             //someColorValue = Color.Lerp(start, end, normalizedTime);
             lineRenderer.colorGradient = new Gradient
             {
-                colorKeys = new[] { new GradientColorKey(lineRenderer.startColor, 0.0f), new GradientColorKey(lineRenderer.endColor, 1.0f) },
-                alphaKeys = new[] { new GradientAlphaKey(1-normalizedTime, 0.0f), new GradientAlphaKey(1-normalizedTime, 1.0f) }
+                colorKeys = new[]
+                {
+                    new GradientColorKey(lineRenderer.startColor, 0.0f),
+                    new GradientColorKey(lineRenderer.endColor, 1.0f)
+                },
+                alphaKeys = new[]
+                {
+                    new GradientAlphaKey(1 - normalizedTime, 0.0f),
+                    new GradientAlphaKey(1 - normalizedTime, 1.0f)
+                }
             };
             yield return null;
         }
         //someColorValue = end; //without this, the value will end at something like 0.9992367
     }
-
 }
-
-

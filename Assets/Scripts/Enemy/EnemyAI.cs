@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class EnemyAI : MonoBehaviour {
+public class EnemyAI : MonoBehaviour
+{
     public Transform target;
     public String enemyName;
     public float speed = 5f;
@@ -43,16 +44,18 @@ public class EnemyAI : MonoBehaviour {
             RotateToTarget();
             AttackCooldown();
         }
-    }   
+    }
 
-    protected virtual void GetTarget() {
-        if (GameObject.FindGameObjectWithTag("Player")) 
+    protected virtual void GetTarget()
+    {
+        if (GameObject.FindGameObjectWithTag("Player"))
         {
             target = GameObject.FindGameObjectWithTag("Player").transform;
         }
     }
-    
-    protected virtual void RotateToTarget() {
+
+    protected virtual void RotateToTarget()
+    {
         Vector2 targetDir = target.position - transform.position;
         float angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg - 90f;
         Quaternion q = Quaternion.Euler(new Vector3(0, 0, angle));
@@ -72,7 +75,7 @@ public class EnemyAI : MonoBehaviour {
         if (other.gameObject.CompareTag("DamagingObject"))
         {
             TakeDamage();
-        } 
+        }
         else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown)
         {
             playerController.TakeDamage(1);

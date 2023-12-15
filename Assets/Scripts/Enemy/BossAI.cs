@@ -20,7 +20,6 @@ public class BossAI : EnemyAI
 
     protected override void FixedUpdate()
     {
-
         if (target != null)
         {
             //RotateToTarget();
@@ -33,7 +32,7 @@ public class BossAI : EnemyAI
         if (other.gameObject.CompareTag("DamagingObject"))
         {
             TakeDamage();
-        } 
+        }
         else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown)
         {
             playerController.TakeDamage(3);
@@ -50,12 +49,18 @@ public class BossAI : EnemyAI
                 return false;
             }
             Vector2 directionToPlayer = target.position - transform.position;
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, Mathf.Infinity, LayerMask.GetMask("Player"));
+            RaycastHit2D hit = Physics2D.Raycast(
+                transform.position,
+                directionToPlayer,
+                Mathf.Infinity,
+                LayerMask.GetMask("Player")
+            );
 
             if (hit.collider != null && hit.collider.CompareTag("Wall"))
             {
                 return false;
-            } else if (hit.collider != null && hit.collider.CompareTag("Player"))
+            }
+            else if (hit.collider != null && hit.collider.CompareTag("Player"))
             {
                 // Player is in line of sight
                 return true;

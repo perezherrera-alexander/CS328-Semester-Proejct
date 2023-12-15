@@ -10,6 +10,7 @@ public class SkeletonAI : EnemyAI
         Dropping,
         PileOfBones
     }
+
     public SkeletonState skeletonState = SkeletonState.Walking;
     private int deathCount = 0;
     public float reviveTime = 2f; // In terms of hertz
@@ -34,7 +35,8 @@ public class SkeletonAI : EnemyAI
     protected override void Update()
     {
         base.Update();
-        switch(skeletonState){
+        switch (skeletonState)
+        {
             case SkeletonState.Walking:
                 spriteRenderer.sprite = walkingSprite;
                 if (CanSeePlayer())
@@ -53,7 +55,8 @@ public class SkeletonAI : EnemyAI
                 spriteRenderer.sprite = pileOfBonesSprite;
                 rb.velocity = Vector2.zero;
                 reviveTimer += Time.deltaTime;
-                if(reviveTimer >= reviveTime){
+                if (reviveTimer >= reviveTime)
+                {
                     skeletonState = SkeletonState.Walking;
                     health = maxHealth;
                     rb.freezeRotation = false;
@@ -66,7 +69,7 @@ public class SkeletonAI : EnemyAI
     {
         if (skeletonState == SkeletonState.Walking)
         {
-             rb.velocity = transform.up * speed;
+            rb.velocity = transform.up * speed;
 
             if (target != null && target.CompareTag("Player"))
             {
@@ -90,7 +93,11 @@ public class SkeletonAI : EnemyAI
                 Die();
             }
         }
-        else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown && skeletonState == SkeletonState.Walking)
+        else if (
+            other.gameObject.CompareTag("Player")
+            && lastAttackTime >= attackCooldown
+            && skeletonState == SkeletonState.Walking
+        )
         {
             playerController.TakeDamage(1);
         }
@@ -108,11 +115,13 @@ public class SkeletonAI : EnemyAI
     protected override void Die()
     {
         //Debug.Log("Skeleton died");
-        if(skeletonState == SkeletonState.Walking){
+        if (skeletonState == SkeletonState.Walking)
+        {
             skeletonState = SkeletonState.Dropping;
             health = pileOfBonesHealth;
         }
-        else if(skeletonState == SkeletonState.PileOfBones){
+        else if (skeletonState == SkeletonState.PileOfBones)
+        {
             deathCount++;
             //Debug.Log("Skeleton death count: " + deathCount);
             if (deathCount >= 2)
@@ -146,12 +155,18 @@ public class SkeletonAI : EnemyAI
         if (target != null && target.CompareTag("Player"))
         {
             Vector2 directionToPlayer = target.position - transform.position;
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, Mathf.Infinity, LayerMask.GetMask("Player"));
+            RaycastHit2D hit = Physics2D.Raycast(
+                transform.position,
+                directionToPlayer,
+                Mathf.Infinity,
+                LayerMask.GetMask("Player")
+            );
 
             if (hit.collider != null && hit.collider.CompareTag("Wall"))
             {
                 return false;
-            } else if (hit.collider != null && hit.collider.CompareTag("Player"))
+            }
+            else if (hit.collider != null && hit.collider.CompareTag("Player"))
             {
                 // Player is in line of sight
                 return true;
