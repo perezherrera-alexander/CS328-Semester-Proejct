@@ -95,6 +95,7 @@ public class EnemyAI : MonoBehaviour
     protected virtual void Die()
     {
         playerController.increaseHealth(5);
+        playerController.increaseMana(10);
         AudioSource.PlayClipAtPoint(enemyDeathSound, transform.position);
         Destroy(gameObject);
     }

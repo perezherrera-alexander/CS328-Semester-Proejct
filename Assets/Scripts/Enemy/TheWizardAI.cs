@@ -28,6 +28,8 @@ public class TheWizardAI : BossAI
 
     public float beamDuration = 0.5f;
 
+    public float beamLength = 4f;
+
     //private bool beamExists = false;
 
     protected override void Start()
@@ -120,7 +122,7 @@ public class TheWizardAI : BossAI
     {
         if (!isDoingAttack && lastAttackTimer >= attackCooldownTime)
         {
-            int randomAttack = Random.Range(1, 3); // This 3 is here so that he isn't always attacking.
+            int randomAttack = Random.Range(1, 1); // This 3 is here so that he isn't always attacking.
             AllMighty(randomAttack);
         }
     }
@@ -172,6 +174,8 @@ public class TheWizardAI : BossAI
         GameObject bullet = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
         bullet.GetComponent<BossBulletBehavior>().setPlayerController(playerController.gameObject);
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
+        // disable bullet collision with boss
+        Physics2D.IgnoreCollision(bullet.GetComponent<Collider2D>(), GetComponent<Collider2D>());
 
         float randomAngle = Random.Range(-randomAngleRange, randomAngleRange); // Get random angle deviation
         float adjustedBulletSpeed =
@@ -233,7 +237,7 @@ public class TheWizardAI : BossAI
             bool foundPlayer = false;
             Vector3 beamOffset = new Vector3(0f, 0.5f, 0f);
             lineRenderer.SetPosition(0, transform.position + beamOffset);
-            float beamLength = 7f;
+            
             LayerMask mask = LayerMask.GetMask("Wall", "Player");
             RaycastHit2D[] hit = Physics2D.RaycastAll(
                 transform.position,
