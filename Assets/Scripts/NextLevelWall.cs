@@ -25,15 +25,19 @@ public class NextLevelWall : MonoBehaviour
 
     protected virtual void OnCollisionEnter2D(Collision2D other)
     {
-        if (GameObject.FindGameObjectWithTag("Boss") == null && other.gameObject.CompareTag("Player"))
+        if (
+            GameObject.FindGameObjectWithTag("Boss") == null
+            && other.gameObject.CompareTag("Player")
+        )
         {
             // If so, load the next level
             SceneManager.LoadScene("Level02");
         }
     }
 
-    void GetTarget() {
-        if (GameObject.FindGameObjectWithTag("Player")) 
+    void GetTarget()
+    {
+        if (GameObject.FindGameObjectWithTag("Player"))
         {
             target = GameObject.FindGameObjectWithTag("Player").transform;
         }

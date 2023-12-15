@@ -12,9 +12,9 @@ public class GhostAI : EnemyAI
 
     public GhostState ghostState = GhostState.Floating;
 
-    #pragma warning disable 0414
+#pragma warning disable 0414
     private bool isInvisible = false;
-    #pragma warning restore 0414
+#pragma warning restore 0414
     private float floatSpeed;
     private float invisSpeed;
 
@@ -42,7 +42,7 @@ public class GhostAI : EnemyAI
             case GhostState.Invisible:
                 isInvisible = true;
                 rb.velocity = transform.up * invisSpeed;
-                
+
                 // Disable circle collider
                 GetComponent<CircleCollider2D>().enabled = false;
                 break;
@@ -59,11 +59,10 @@ public class GhostAI : EnemyAI
         if (other.gameObject.CompareTag("DamagingObject"))
         {
             TakeDamage();
-        } 
+        }
         else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown)
         {
-            Debug.Log("Ghost hit player");
-            playerController.TakeDamage(1);
+            other.gameObject.GetComponent<Movement>().TakeDamage(0.75f);
         }
         else if (other.gameObject.CompareTag("Wall"))
         {
@@ -79,13 +78,6 @@ public class GhostAI : EnemyAI
 
     private bool isInWall()
     {
-        if (Physics2D.OverlapCircle(transform.position, 0.5f, LayerMask.GetMask("Wall")))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return Physics2D.OverlapCircle(transform.position, 0.5f, LayerMask.GetMask("Wall"));
     }
 }

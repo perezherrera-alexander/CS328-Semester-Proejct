@@ -1,36 +1,45 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class PauseMenu : MonoBehaviour {
+public class PauseMenu : MonoBehaviour
+{
     public static bool GameIsPaused = false;
     public GameObject pauseMenuUI;
 
     public AudioManager audioManager;
 
     // Update is called once per frame
-    void Update() {
-        if (Input.GetKeyDown(KeyCode.Escape)) {
-            if (GameIsPaused) {
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (GameIsPaused)
+            {
                 Resume();
-            } else {
+            }
+            else
+            {
                 Pause();
             }
         }
     }
 
-    public void Resume() {
+    public void Resume()
+    {
         pauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
         GameIsPaused = false;
     }
 
-    void Pause() {
+    void Pause()
+    {
         pauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
         GameIsPaused = true;
     }
 
-    public void QuitGame() {
+    public void QuitGame()
+    {
         pauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
         GameIsPaused = false;
@@ -38,22 +47,23 @@ public class PauseMenu : MonoBehaviour {
         Debug.Log("Quit");
     }
 
-    public void GoToMainMenu() {
+    public void GoToMainMenu()
+    {
         pauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
         GameIsPaused = false;
         SceneManager.LoadScene("MainMenu");
     }
 
-/*
-    public void ToggleMusic()
-    {
-        audioManager.s.source.mute = !audioManager.s.source.mute;
-    }
-
-    public void MusicVolume(float volume)
-    {
-        audioManager.s.source.volume = volume;
-    }
-*/
+    /*
+        public void ToggleMusic()
+        {
+            audioManager.s.source.mute = !audioManager.s.source.mute;
+        }
+    
+        public void MusicVolume(float volume)
+        {
+            audioManager.s.source.volume = volume;
+        }
+    */
 }

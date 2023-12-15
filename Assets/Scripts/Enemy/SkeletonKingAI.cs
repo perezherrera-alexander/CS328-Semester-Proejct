@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class SkeletonKingAI : BossAI
 {
-    [SerializeField] private GameObject skeletonPrefab; // Skeleton prefab to be thrown
+    [SerializeField]
+    private GameObject skeletonPrefab; // Skeleton prefab to be thrown
 
     private List<GameObject> skeletons; // List of skeletons thrown by the Skeleton King
     private GameObject parentObject; // Parent GameObject for the skeletons
@@ -33,7 +34,7 @@ public class SkeletonKingAI : BossAI
     {
         base.Start();
         enemyName = "Skeleton King";
-        
+
         originalSpeed = speed;
 
         parentObject = new GameObject("Thrown Skeletons"); // Create a new GameObject to parent the skeletons
@@ -43,13 +44,13 @@ public class SkeletonKingAI : BossAI
     protected override void Update()
     {
         base.Update();
-        switch(bossState)
+        switch (bossState)
         {
             case BossState.Ranged:
-                if(CanSeePlayer())
+                if (CanSeePlayer())
                 {
                     RangedMode();
-                    if(Vector2.Distance(transform.position, target.position) < meleeRange)
+                    if (Vector2.Distance(transform.position, target.position) < meleeRange)
                     {
                         bossState = BossState.Melee;
                     }
@@ -57,11 +58,11 @@ public class SkeletonKingAI : BossAI
                 rangedAttackTimer -= Time.deltaTime;
                 break;
             case BossState.Melee:
-                if(CanSeePlayer())
+                if (CanSeePlayer())
                 {
                     MeleeMode();
                     RangedMode();
-                    if(Vector2.Distance(transform.position, target.position) > meleeRange)
+                    if (Vector2.Distance(transform.position, target.position) > meleeRange)
                     {
                         bossState = BossState.Ranged;
                         rb.velocity = Vector2.zero;
@@ -76,21 +77,22 @@ public class SkeletonKingAI : BossAI
     {
         base.FixedUpdate();
     }
-/*
-    private bool IsPlayerInBox()
-    {
-        // Check if the player is within the specified box
-        float boxSize = 15f;
 
-        // Use the boundary GameObject to check if the boss is within the specified boundary
-        Collider2D boundaryCollider = boundary.GetComponent<Collider2D>();
-        bool isInBoundary = Physics2D.OverlapBox(transform.position, new Vector2(boxSize, boxSize), 0f, 1 << boundaryCollider.gameObject.layer);
-
-        return isInBoundary &&
-               Mathf.Abs(transform.position.x - target.position.x) < boxSize * 0.5f &&
-               Mathf.Abs(transform.position.y - target.position.y) < boxSize * 0.5f;
-    }
-    */
+    /*
+        private bool IsPlayerInBox()
+        {
+            // Check if the player is within the specified box
+            float boxSize = 15f;
+    
+            // Use the boundary GameObject to check if the boss is within the specified boundary
+            Collider2D boundaryCollider = boundary.GetComponent<Collider2D>();
+            bool isInBoundary = Physics2D.OverlapBox(transform.position, new Vector2(boxSize, boxSize), 0f, 1 << boundaryCollider.gameObject.layer);
+    
+            return isInBoundary &&
+                   Mathf.Abs(transform.position.x - target.position.x) < boxSize * 0.5f &&
+                   Mathf.Abs(transform.position.y - target.position.y) < boxSize * 0.5f;
+        }
+        */
 
     private void RangedMode()
     {
@@ -134,7 +136,12 @@ public class SkeletonKingAI : BossAI
     private void ThrowSkeleton()
     {
         // Instantiate a new skeleton GameObject
-        GameObject skeleton = Instantiate(skeletonPrefab, transform.position /*+ new Vector3 (2, 2, 0)*/, Quaternion.identity);
+        GameObject skeleton = Instantiate(
+            skeletonPrefab,
+            transform.position /*+ new Vector3 (2, 2, 0)*/
+            ,
+            Quaternion.identity
+        );
         parentObject.transform.position = transform.position;
         skeleton.transform.parent = parentObject.transform;
         skeletons.Add(skeleton);
@@ -150,9 +157,13 @@ public class SkeletonKingAI : BossAI
         StartCoroutine(AddForceToSkeleton(skeletonRigidbody, direction, skeletonCollider));
     }
 
-    IEnumerator AddForceToSkeleton(Rigidbody2D skeletonRigidbody, Vector2 direction, Collider2D skeletonCollider)
+    IEnumerator AddForceToSkeleton(
+        Rigidbody2D skeletonRigidbody,
+        Vector2 direction,
+        Collider2D skeletonCollider
+    )
     {
-        for(int i = 0; i < 25; i++)
+        for (int i = 0; i < 25; i++)
         {
             skeletonRigidbody.AddForce(direction * 750, ForceMode2D.Force);
             yield return new WaitForSeconds(0.02f);

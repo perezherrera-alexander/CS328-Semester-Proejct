@@ -6,17 +6,19 @@ using UnityEngine;
 
 public class ArmorAI : EnemyAI
 {
-    public enum ArmorState 
+    public enum ArmorState
     {
         Walking,
         Hardening,
         Hardened
     }
+
     public ArmorState armorState = ArmorState.Walking;
     public float hardenTime = 3f;
     public float walkTime = 5f;
     private float timeSinceLastHarden = 0f;
     private float timeSpentHardened = 0f;
+
     protected override void Start()
     {
         base.Start();
@@ -26,7 +28,7 @@ public class ArmorAI : EnemyAI
     protected override void Update()
     {
         base.Update();
-        switch(armorState)
+        switch (armorState)
         {
             case ArmorState.Walking:
                 // If the armor can see the player, chase them
@@ -35,7 +37,7 @@ public class ArmorAI : EnemyAI
                     ChasePlayer();
                 }
                 timeSinceLastHarden += Time.deltaTime;
-                if(timeSinceLastHarden >= walkTime)
+                if (timeSinceLastHarden >= walkTime)
                 {
                     armorState = ArmorState.Hardening;
                 }
@@ -50,7 +52,7 @@ public class ArmorAI : EnemyAI
             case ArmorState.Hardened:
                 timeSpentHardened += Time.deltaTime;
                 rb.velocity = Vector2.zero;
-                if(timeSpentHardened >= hardenTime)
+                if (timeSpentHardened >= hardenTime)
                 {
                     armorState = ArmorState.Walking;
                     rb.freezeRotation = false;
@@ -63,7 +65,7 @@ public class ArmorAI : EnemyAI
 
     protected override void FixedUpdate()
     {
-        if(armorState == ArmorState.Walking)
+        if (armorState == ArmorState.Walking)
         {
             rb.velocity = transform.up * speed;
 
@@ -75,36 +77,41 @@ public class ArmorAI : EnemyAI
         }
     }
 
-    
     protected override void OnCollisionEnter2D(Collision2D other)
     {
         // Check if the Skeleton collides with a damaging object (e.g., player's attack)
         if (other.gameObject.CompareTag("DamagingObject"))
         {
-            if(armorState == ArmorState.Hardened)
+            if (armorState == ArmorState.Hardened)
             {
                 // If the armor is hardened, do not take damage
                 return;
             }
-            else {
+            else
+            {
                 TakeDamage();
             }
         }
-        else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown && armorState == ArmorState.Walking)
+        else if (
+            other.gameObject.CompareTag("Player")
+            && lastAttackTime >= attackCooldown
+            && armorState == ArmorState.Walking
+        )
         {
             playerController.TakeDamage(4);
         }
     }
 
-   public void InflictDamage()
+    public void InflictDamage()
     {
         //Debug.Log("Armor took damage");
-        if(armorState == ArmorState.Hardened)
+        if (armorState == ArmorState.Hardened)
         {
-                // If the armor is hardened, do not take damage
+            // If the armor is hardened, do not take damage
             return;
         }
-        else {
+        else
+        {
             TakeDamage();
         }
     }
@@ -124,12 +131,18 @@ public class ArmorAI : EnemyAI
         if (target != null && target.CompareTag("Player"))
         {
             Vector2 directionToPlayer = target.position - transform.position;
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, Mathf.Infinity, LayerMask.GetMask("Player"));
+            RaycastHit2D hit = Physics2D.Raycast(
+                transform.position,
+                directionToPlayer,
+                Mathf.Infinity,
+                LayerMask.GetMask("Player")
+            );
 
             if (hit.collider != null && hit.collider.CompareTag("Wall"))
             {
                 return false;
-            } else if (hit.collider != null && hit.collider.CompareTag("Player"))
+            }
+            else if (hit.collider != null && hit.collider.CompareTag("Player"))
             {
                 // Player is in line of sight
                 return true;
