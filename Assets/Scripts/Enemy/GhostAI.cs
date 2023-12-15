@@ -62,6 +62,7 @@ public class GhostAI : EnemyAI
         } 
         else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown)
         {
+            Debug.Log("Ghost hit player");
             playerController.TakeDamage(1);
         }
         else if (other.gameObject.CompareTag("Wall"))

@@ -2,6 +2,17 @@
 
 Unity Version: 2022.3.9f1 (LTS)
 
+### Version 0.6.0 (12/14/2023)
+- Added 2 new enemies
+    - Ghost
+    - Minion (Unused)
+- Added Wizard boss to level 2
+- Completed level 2 design & logic
+- Fully implemented beam staff
+    - Fires a continuous beam of energy that can hit multiple enemies
+- Added weapon switching (Press 1 or 2)
+- Added win logic & screen to level 2
+
 ### Version 0.3.0 (12/1/2023)
 - Added 3 new enemies
     - Skeleton

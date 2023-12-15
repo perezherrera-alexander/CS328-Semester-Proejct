@@ -257,7 +257,7 @@ public class Movement : MonoBehaviour
                     hitWall = true;
                 }
             }
-            else if(h.collider.gameObject.CompareTag("Enemy") || h.collider.gameObject.CompareTag("Goblin")) {
+            else if(h.collider.gameObject.CompareTag("Enemy") || h.collider.gameObject.CompareTag("Goblin") || h.collider.gameObject.CompareTag("Boss")) {
                 enemiesHit.Add(h.collider.gameObject);
             }
         }
@@ -284,12 +284,8 @@ public class Movement : MonoBehaviour
                     else if(enemy.GetComponent<EnemyAI>().enemyName == "Skeleton") {
                         enemy.GetComponent<SkeletonAI>().InflictDamage();
                     }
-                    else if(enemy.GetComponent<EnemyAI>().enemyName == "Skeleton King")
-                    {
-                        enemy.GetComponent<SkeletonKingAI>().TakeDamage();
-                    }
-                    else if(enemy.GetComponent<EnemyAI>().enemyName == "Wizard"){
-                        enemy.GetComponent<TheWizardAI>().TakeDamage();
+                    else if(enemy.gameObject.CompareTag("Boss")) {
+                        enemy.GetComponent<EnemyAI>().TakeDamage();
                     }
                     else {
                         Debug.Log("Uh oh, someone didn't add a case for this enemy (Alexander's fault)");

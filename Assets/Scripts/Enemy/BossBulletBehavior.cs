@@ -19,6 +19,7 @@ public class BossBulletBehavior : MonoBehaviour
         }
         else if (collision.gameObject.CompareTag("Player"))
         {
+            collision.gameObject.GetComponent<Movement>().TakeDamage(0.2f);
             Destroy(gameObject);
         }
     }

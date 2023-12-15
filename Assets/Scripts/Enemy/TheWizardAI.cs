@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
+using UnityEngine.SceneManagement;
 
-// TODO:
-// Speed isnt working! set it to zero, and he still moves
-// Beam shouldnt be instant, maybe some warning somehow, or maybe the beam "sweeps" from one direction to another
 public class TheWizardAI : BossAI
 {
     public GameObject projectilePrefab;
@@ -20,7 +18,6 @@ public class TheWizardAI : BossAI
     private bool isTeleporting = false;
     private float attackCooldownTime = 0.5f;
     private float lastAttackTimer = 0f;
-
     private float startHealth;
     private float startSpeed;
     public float halfHealthSpeedBuff = 1.2f;
@@ -31,11 +28,11 @@ public class TheWizardAI : BossAI
 
     public float beamDuration = 0.5f;
 
+    //private bool beamExists = false;
+
     protected override void Start()
     {
         base.Start();
-
-        health = 150;
 
         attackCooldown = 5f;
         attackCooldownTime = Random.Range(0.5f, 2.5f);
@@ -56,10 +53,12 @@ public class TheWizardAI : BossAI
             lastTeleportTime = Time.deltaTime;
         }
 
+        /*
         if (Time.deltaTime - lastTeleportTime >= teleportCooldown && playerController.playerIsShooting)
         {
             Teleport();
         }
+        */
 
         if (health <= startHealth / 2)
         {
@@ -82,6 +81,7 @@ public class TheWizardAI : BossAI
         }
     }
 
+    
     protected override void RotateToTarget()
     {
         if (target.CompareTag("Player"))
@@ -106,11 +106,11 @@ public class TheWizardAI : BossAI
             float randomFloat = Random.Range(0f, 1f);
             if (randomFloat <= 0.5f)
             {
-                rb.velocity = transform.right * speed;
+                rb.velocity = transform.right * speed * 0.5f;
             }
             else
             {
-                rb.velocity = -transform.right * speed;
+                rb.velocity = -transform.right * speed * 0.5f;
             }
             yield return new WaitForSeconds(duration);
             //rb.velocity = Vector2.zero;
@@ -122,7 +122,7 @@ public class TheWizardAI : BossAI
     {
         if (!isDoingAttack && lastAttackTimer >= attackCooldownTime)
         {
-            int randomAttack = Random.Range(1, 3);
+            int randomAttack = Random.Range(1, 3); // This 3 is here so that he isn't always attacking.
             AllMighty(randomAttack);
         }
     }
@@ -135,38 +135,38 @@ public class TheWizardAI : BossAI
                 ShootProjectiles();
                 break;
             case 2:
-                ShootBeam();
+                StartCoroutine(ShootBeam());
                 break;
         }    
         
         beingUsedByBoss = false;    
     }
 
-private bool isShooting = false;
+    private bool isShooting = false;
 
-private IEnumerator ShootProjectilesCoroutine()
-{
-    isShooting = true;
-    isDoingAttack = true;
-    beingUsedByBoss = true;
-
-    int randomNumberOfProjectiles = Random.Range(3, 12);
-    for (int i = 0; i < randomNumberOfProjectiles; i++)
+    private IEnumerator ShootProjectilesCoroutine()
     {
-        SpawnProjectileLogic();
-        yield return new WaitForSeconds(shootingCooldown);
+        isShooting = true;
+        isDoingAttack = true;
+        beingUsedByBoss = true;
+
+        int randomNumberOfProjectiles = Random.Range(3, 12);
+        for (int i = 0; i < randomNumberOfProjectiles; i++)
+        {
+            SpawnProjectileLogic();
+            yield return new WaitForSeconds(shootingCooldown);
+        }
+
+        lastAttackTimer = 0f;
+        isDoingAttack = false;
+        beingUsedByBoss = false;
+        isShooting = false;
     }
 
-    lastAttackTimer = 0f;
-    isDoingAttack = false;
-    beingUsedByBoss = false;
-    isShooting = false;
-}
-
-private void ShootProjectiles()
-{
-    if (!isShooting) StartCoroutine(ShootProjectilesCoroutine());
-}
+    private void ShootProjectiles()
+    {
+        if (!isShooting) StartCoroutine(ShootProjectilesCoroutine());
+    }
 
     private void SpawnProjectileLogic()
     {
@@ -184,61 +184,81 @@ private void ShootProjectiles()
         if (target.CompareTag("Player")) return;
     }
 
-private void ShootBeam()
-{
-    if (target.CompareTag("Player"))
+    private IEnumerator ShootBeam()
     {
-        isDoingAttack = true;
-        beingUsedByBoss = true;
+        if (target.CompareTag("Player"))
+        {
+            isDoingAttack = true;
+            beingUsedByBoss = true;
 
-        GameObject beam = GameObject.Find("EnemyBeam");
-        LineRenderer lineRenderer;
-        if (beam == null) {
-            beam = new GameObject("EnemyBeam");
-            lineRenderer = beam.AddComponent<LineRenderer>();
-            lineRenderer.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
-            lineRenderer.startColor = Color.red;
-            lineRenderer.endColor = Color.yellow;
-            lineRenderer.startWidth = 0.2f;
-            lineRenderer.endWidth = 0.2f;
-            lineRenderer.colorGradient = new Gradient {
-                colorKeys = new [] { new GradientColorKey(lineRenderer.startColor, 0.0f), new GradientColorKey(lineRenderer.endColor, 1.0f) },
-                alphaKeys = new [] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
-            };
-        } else {
-            lineRenderer = beam.GetComponent<LineRenderer>();
+            // Create visual effect to warn player
+            CreateBeamEffect(transform.position);
+
+            yield return new WaitForSeconds(1f);
+
+            GameObject beam = GameObject.Find("EnemyBeam");
+            LineRenderer lineRenderer;
+            if (beam == null)
+            {
+                beam = new GameObject("EnemyBeam");
+                lineRenderer = beam.AddComponent<LineRenderer>();
+                lineRenderer.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+                lineRenderer.startColor = Color.red;
+                lineRenderer.endColor = Color.yellow;
+                lineRenderer.colorGradient = new Gradient
+                {
+                    colorKeys = new[] { new GradientColorKey(lineRenderer.startColor, 0.0f), new GradientColorKey(lineRenderer.endColor, 1.0f) },
+                    alphaKeys = new[] { new GradientAlphaKey(1.0f, 0.0f), new GradientAlphaKey(1.0f, 1.0f) }
+                };
+                lineRenderer.startWidth = 0.2f;
+                lineRenderer.endWidth = 0.2f;
+
+            }
+            else
+            {
+                lineRenderer = beam.GetComponent<LineRenderer>();
+            }
+
+            bool foundPlayer = false;
+            Vector3 beamOffset = new Vector3(0f, 0.5f, 0f);
+            lineRenderer.SetPosition(0, transform.position + beamOffset);
+            float beamLength = 5f;
+            LayerMask mask = LayerMask.GetMask("Wall", "Player");
+            RaycastHit2D[] hit = Physics2D.RaycastAll(transform.position, (target.transform.position - transform.position).normalized, beamLength, mask);
+            foreach (RaycastHit2D h in hit)
+            {
+                if (h.collider != null)
+                {
+                    if (h.collider.gameObject.CompareTag("Player")) h.collider.gameObject.GetComponent<Movement>().TakeDamage(2f);
+                    lineRenderer.SetPosition(1, h.point);
+                    foundPlayer = true;
+                    break;
+                }
+            }
+            if (!foundPlayer) lineRenderer.SetPosition(1, transform.position + (target.transform.position - transform.position).normalized * beamLength);
+
+            StartCoroutine(DoAThingOverTime(lineRenderer, beamDuration));
+            StartCoroutine(DeactivateBeam(beam, beamDuration));
         }
-
-        Vector3 beamOffset = new Vector3(0f, 0.5f, 0f);
-        lineRenderer.SetPosition(0, transform.position + beamOffset);
-        float beamLength = 5f;
-        LayerMask mask = LayerMask.GetMask("Wall", "Player");
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, (target.transform.position - transform.position).normalized, beamLength, mask);
-        if (hit.collider != null) {
-            if (hit.collider.gameObject.CompareTag("Player")) hit.collider.gameObject.GetComponent<Movement>().TakeDamage(2f);
-            lineRenderer.SetPosition(1, hit.point);
-        }
-
-        StartCoroutine(DeactivateBeam(beam, beamDuration));
+        yield return null;
     }
-}
 
-private IEnumerator DeactivateBeam(GameObject beam, float duration)
-{
-    yield return new WaitForSeconds(duration);
+    private IEnumerator DeactivateBeam(GameObject beam, float duration)
+    {
+        yield return new WaitForSeconds(duration);
 
-    // After the duration, deactivate the beam
-    if (beam != null) {
-        LineRenderer lineRenderer = beam.GetComponent<LineRenderer>();
-        if (lineRenderer != null) {
-            lineRenderer.SetPosition(0, Vector3.zero);
-            lineRenderer.SetPosition(1, Vector3.zero);
+        // After the duration, deactivate the beam
+        if (beam != null) {
+            LineRenderer lineRenderer = beam.GetComponent<LineRenderer>();
+            if (lineRenderer != null) {
+                lineRenderer.SetPosition(0, Vector3.zero);
+                lineRenderer.SetPosition(1, Vector3.zero);
+            }
+            beam.SetActive(false);
         }
-        beam.SetActive(false);
+        isDoingAttack = false;
+        beingUsedByBoss = false;
     }
-    isDoingAttack = false;
-    beingUsedByBoss = false;
-}
 
     private void Teleport()
     {
@@ -260,6 +280,9 @@ private IEnumerator DeactivateBeam(GameObject beam, float duration)
     {
         if (other.gameObject.CompareTag("DamagingObject"))
         {
+            Debug.Log("Health: " + health);
+            TakeDamage();
+            /*
             float randInt = Random.Range(0, 1);
             if (randInt == 0)
             {
@@ -289,10 +312,11 @@ private IEnumerator DeactivateBeam(GameObject beam, float duration)
                     TakeDamage();
                 }
             }
+            */
         } 
         else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown)
         {
-            playerController.TakeDamage(1);
+            playerController.TakeDamage(2);
         }
     }
 
@@ -301,6 +325,63 @@ private IEnumerator DeactivateBeam(GameObject beam, float duration)
         base.Die();
         // Additional logic for The Wizard's death behavior
         // Example: Drop special loot or trigger a cutscene
+        SceneManager.LoadScene("EndScreen");
     }
+
+    private void CreateBeamEffect(Vector3 hitLocation) {
+        GameObject beamEffect = new GameObject("BeamEffect");
+        ParticleSystem particleSystem = beamEffect.AddComponent<ParticleSystem>();
+    
+        // Set the position of the effect to the hit location
+        beamEffect.transform.position = hitLocation;
+    
+        var main = particleSystem.main;
+        main.startSize = new ParticleSystem.MinMaxCurve(0.03f, 0.09f);
+        main.startSpeed = new ParticleSystem.MinMaxCurve(1f, 3f);
+        main.startColor = Color.red;
+        //main.remain
+        main.startLifetime = 0.08f;
+        //main.duration = 0.05f;
+
+        var emission = particleSystem.emission;
+        emission.rateOverTime = 200;
+
+    
+        // Create a simple red material for the particles
+        Material redMaterial = new Material(Shader.Find("Particles/Standard Unlit"));
+        redMaterial.color = Color.red;
+
+        particleSystem.GetComponent<ParticleSystemRenderer>().material = redMaterial;
+
+        particleSystem.Play();
+        // Stop the particle system after 0.05 seconds
+        StartCoroutine(StopParticleSystemAfterDelay(particleSystem, 0.08f));
+    }
+
+    private IEnumerator StopParticleSystemAfterDelay(ParticleSystem particleSystem, float delay) {
+        yield return new WaitForSeconds(delay);
+    
+        // Stop the particle system
+        particleSystem.Stop();
+        // Delte the particle system after 1 second
+        Destroy(particleSystem.gameObject, 1f);
+    }
+
+    IEnumerator DoAThingOverTime(LineRenderer lineRenderer, float duration) {
+        for (float t=0f;t<duration;t+=Time.deltaTime) {
+            float normalizedTime = t/duration;
+            //right here, you can now use normalizedTime as the third parameter in any Lerp from start to end
+            //someColorValue = Color.Lerp(start, end, normalizedTime);
+            lineRenderer.colorGradient = new Gradient
+            {
+                colorKeys = new[] { new GradientColorKey(lineRenderer.startColor, 0.0f), new GradientColorKey(lineRenderer.endColor, 1.0f) },
+                alphaKeys = new[] { new GradientAlphaKey(1-normalizedTime, 0.0f), new GradientAlphaKey(1-normalizedTime, 1.0f) }
+            };
+            yield return null;
+        }
+        //someColorValue = end; //without this, the value will end at something like 0.9992367
+    }
+
 }
+
 

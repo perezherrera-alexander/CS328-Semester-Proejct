@@ -10,8 +10,6 @@ public class BossAI : EnemyAI
     {
         base.Start();
 
-        health = 100;
-
         maxHealth = health;
     }
 
