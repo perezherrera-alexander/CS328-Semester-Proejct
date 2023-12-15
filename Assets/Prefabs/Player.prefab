@@ -109,7 +109,7 @@ MonoBehaviour:
   dashDuration: 5
   dashCooldownTimer: 25
   dashBar: {fileID: 0}
-  maxHealth: 10
+  maxHealth: 15
   currentHealth: 0
   healthBar: {fileID: 0}
   maxMana: 100
@@ -123,6 +123,7 @@ MonoBehaviour:
   bulletSpeed: 9
   shootingCooldown: 0.05
   beamDamageTime: 0.1
+  beamManaUse: 0.3
   randomAngleRange: 6
   randomSpeedRange: 1
   bulletDamage: 2

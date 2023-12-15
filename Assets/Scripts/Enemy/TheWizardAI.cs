@@ -170,6 +170,7 @@ public class TheWizardAI : BossAI
     private void SpawnProjectileLogic()
     {
         GameObject bullet = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        bullet.GetComponent<BossBulletBehavior>().setPlayerController(playerController.gameObject);
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
 
         float randomAngle = Random.Range(-randomAngleRange, randomAngleRange); // Get random angle deviation
@@ -281,6 +282,7 @@ public class TheWizardAI : BossAI
         }
         isDoingAttack = false;
         beingUsedByBoss = false;
+        Destroy(beam);
     }
 
     private void Teleport()
@@ -311,6 +313,7 @@ public class TheWizardAI : BossAI
         {
             Debug.Log("Health: " + health);
             TakeDamage();
+            /*
             float randInt = Random.Range(0, 1);
             if (randInt == 0)
             {
@@ -340,10 +343,12 @@ public class TheWizardAI : BossAI
                     TakeDamage();
                 }
             }
+            */
         }
         else if (other.gameObject.CompareTag("Player") && lastAttackTime >= attackCooldown)
         {
             playerController.TakeDamage(2);
+            Debug.Log("Player Health: " + playerController.currentHealth);
         }
     }
 

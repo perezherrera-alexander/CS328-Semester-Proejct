@@ -130,7 +130,8 @@ public class SkeletonAI : EnemyAI
                 base.Die();
 
                 // Give player back mana
-                playerController.currentMana += 15;
+                //playerController.currentMana += 15;
+                playerController.increaseMana(15);
             }
             else
             {

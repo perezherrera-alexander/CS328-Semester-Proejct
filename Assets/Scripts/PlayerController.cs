@@ -16,7 +16,7 @@ public class Movement : MonoBehaviour
     public DashBar dashBar;
     private Rigidbody2D rb;
 
-    public int maxHealth = 20;
+    public int maxHealth;
     public float currentHealth;
     public HealthBar healthBar;
 
@@ -106,6 +106,8 @@ public class Movement : MonoBehaviour
         {
             weaponType = WeaponType.Beam;
         }
+
+        healthBar.SetHealth(currentHealth);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -559,5 +561,27 @@ public class Movement : MonoBehaviour
         particleSystem.Stop();
         // Delte the particle system after 1 second
         Destroy(particleSystem.gameObject, 1f);
+    }
+
+    public void increaseHealth(float health){
+        if (currentHealth + health >= maxHealth)
+        {
+            currentHealth = maxHealth;
+        }
+        else
+        {
+            currentHealth += health;
+        }
+    }
+
+    public void increaseMana(float mana){
+        if (currentMana + mana >= maxMana)
+        {
+            currentMana = maxMana;
+        }
+        else
+        {
+            currentMana += mana;
+        }
     }
 }

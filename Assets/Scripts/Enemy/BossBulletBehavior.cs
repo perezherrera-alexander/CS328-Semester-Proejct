@@ -5,6 +5,7 @@ using UnityEngine;
 public class BossBulletBehavior : MonoBehaviour
 {
     public float bulletLifetime = 2.0f; // Bullet will exist for 2 seconds by default
+    public GameObject playerController;
 
     // Start is called before the first frame update
     void Start()
@@ -12,15 +13,23 @@ public class BossBulletBehavior : MonoBehaviour
         Destroy(gameObject, bulletLifetime); // Destroy the bullet after the specified lifetime
     }
 
+    public void setPlayerController(GameObject playerController)
+    {
+        this.playerController = playerController;
+    }
+
     void OnCollisionEnter2D(Collision2D collision)
     {
+        Debug.Log("Bullet Collision detected");
         if (collision.gameObject.tag == "Wall")
         {
             Destroy(gameObject); // Then destroy it
         }
         else if (collision.gameObject.CompareTag("Player"))
         {
-            collision.gameObject.GetComponent<Movement>().TakeDamage(0.2f);
+            Debug.Log("Player hit");
+            playerController.GetComponent<Movement>().TakeDamage(1);
+            Debug.Log("Player health: " + playerController.GetComponent<Movement>().currentHealth);
             Destroy(gameObject);
         }
     }
