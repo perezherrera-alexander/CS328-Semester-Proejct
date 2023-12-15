@@ -2,6 +2,11 @@
 
 Unity Version: 2022.3.9f1 (LTS)
 
+### Version 0.6.1 (1215/20230)
+- Fixed issue where when recieving health on enemy kill, health would go above max health
+- Fixed issue where the wizard boss's bullets would collider with the boss itself
+- Removed settings button from main menu
+
 ### Version 0.6.0 (12/14/2023)
 - Added 2 new enemies
     - Ghost
