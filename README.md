@@ -2,7 +2,10 @@
 
 Unity Version: 2022.3.9f1 (LTS)
 
-### Version 0.6.1 (1215/20230)
+### Version 0.6.2 (12/15/2023)
+- Incresed music volume
+
+### Version 0.6.1 (12/15/20230)
 - Fixed issue where when recieving health on enemy kill, health would go above max health
 - Fixed issue where the wizard boss's bullets would collider with the boss itself
 - Removed settings button from main menu
