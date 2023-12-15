@@ -122,7 +122,7 @@ public class TheWizardAI : BossAI
     {
         if (!isDoingAttack && lastAttackTimer >= attackCooldownTime)
         {
-            int randomAttack = Random.Range(1, 1); // This 3 is here so that he isn't always attacking.
+            int randomAttack = Random.Range(1, 3); // This 3 is here so that he isn't always attacking.
             AllMighty(randomAttack);
         }
     }
